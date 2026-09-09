@@ -3,18 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Visita Virtual Street View 360° & VR ao Estádio do Dragão | FC Porto</title>
-  <meta name="description" content="Explora o Estádio do Dragão e o Museu FC Porto em 360° com Google Street View oficial, Modo VR Universal com Giroscópio para todos os óculos VR, sons de estádio reais e Guia IA." />
-  <meta property="og:title" content="Visita Virtual Street View 360° & VR ao Estádio do Dragão" />
-  <meta property="og:description" content="Visita interativa com Google Street View às zonas reais do Estádio do Dragão, Museu FC Porto, Modo VR com Giroscópio e sons reais de estádio." />
+  <title>Visita Virtual Street View 360° ao Estádio do Dragão | Guia de Jogo & Museu FC Porto</title>
+  <meta name="description" content="Explora o Estádio do Dragão e o Museu FC Porto em 360° com Google Street View oficial, Guia Interativo de Dia de Jogo, Portas de Acesso, Como Chegar, Sons de Estádio e Guia IA." />
+  <meta property="og:title" content="Visita Virtual Street View 360° ao Estádio do Dragão | FC Porto" />
+  <meta property="og:description" content="Visita interativa com Google Street View às zonas reais do Estádio do Dragão, Museu FC Porto, Guia de Dia de Jogo, Portas de Acesso e sons de estádio." />
 
   <!-- Google Fonts: Montserrat & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-
-  <!-- Three.js for 3D Photosphere & VR Gyroscope Engine -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <style>
     :root {
@@ -617,223 +614,475 @@
     }
 
     /* ==========================================================================
-       FULLSCREEN UNIVERSAL VR & 3D GYROSCOPE ENGINE (CARDBOARD, QUEST, MOBILE)
+       MATCHDAY HUB & VISITOR ACCESS GUIDE STYLES
        ========================================================================== */
-    .vr-fullscreen-container {
-      position: fixed;
-      inset: 0;
-      background: #000000;
-      z-index: 999999;
-      display: none;
-      flex-direction: row;
-      overflow: hidden;
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
+    .matchday-btn {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(0, 43, 127, 0.5) 100%);
+      border-color: var(--fcp-gold);
+      color: #FFF;
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+    }
+    .matchday-btn:hover {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.4) 0%, rgba(0, 102, 255, 0.6) 100%);
+      border-color: #FFE58F;
+      box-shadow: 0 0 18px rgba(212, 175, 55, 0.45);
     }
 
-    .vr-fullscreen-container.active {
-      display: flex;
-    }
-
-    /* Stereoscopic Dual Viewport Mode */
-    .vr-viewport-sbs {
-      display: flex;
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
-
-    .vr-eye-half {
-      flex: 1;
-      height: 100%;
-      position: relative;
-      overflow: hidden;
-      background: #000000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* WebGL 3D Canvas Canvas */
-    .vr-webgl-canvas {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      inset: 0;
-      display: block;
-    }
-
-    .vr-eye-frame {
-      width: 100%;
-      height: 100%;
-      border: none;
-      pointer-events: auto;
-      display: none;
-    }
-
-    /* Central VR Divider line for Cardboard / Mobile VR headsets */
-    .vr-center-divider {
-      width: 4px;
-      height: 100%;
-      background: linear-gradient(180deg, #000 0%, #444 50%, #000 100%);
-      position: absolute;
-      left: 50%;
-      top: 0;
-      transform: translateX(-50%);
-      z-index: 100;
-      pointer-events: none;
-    }
-
-    .vr-center-divider::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.4);
-      border: 2px solid #D4AF37;
-    }
-
-    /* In-VR Floating HUD Overlay (Gaze & Remote controls) */
-    .vr-inheadset-hud {
-      position: absolute;
-      top: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 10, 30, 0.92);
-      border: 1.5px solid var(--fcp-gold);
-      border-radius: 20px;
-      padding: 6px 12px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-      z-index: 9999999;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 0 25px rgba(0, 0, 0, 0.9);
-      pointer-events: auto;
-      max-width: 96vw;
-    }
-
-    .vr-hud-item {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 11px;
-      font-weight: 800;
+    .matchday-hud-btn {
+      background: rgba(0, 43, 127, 0.85);
+      border-color: var(--fcp-gold);
       color: #FFE58F;
+      font-weight: 800;
+    }
+    .matchday-hud-btn:hover {
+      background: #002B7F;
+      border-color: #FFF;
+      color: #FFF;
+    }
+
+    /* Matchday Dialog Modal */
+    .matchday-dialog {
+      background: #060E20;
+      border: 1.5px solid var(--fcp-gold);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 860px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 43, 127, 0.4);
+      position: relative;
       display: flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-      padding: 2px 6px;
+      flex-direction: column;
+      max-height: 88vh;
+      animation: modalFadeIn 0.25s ease-out;
     }
 
-    .vr-gyro-telemetry-badge {
-      background: rgba(16, 185, 129, 0.2);
-      border: 1px solid #10B981;
-      color: #A7F3D0;
-      font-size: 9.5px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 12px;
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .matchday-header {
+      padding: 18px 24px 12px 24px;
+      background: linear-gradient(180deg, #001438 0%, #060E20 100%);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.25);
       display: flex;
-      align-items: center;
-      gap: 4px;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .vr-gyro-telemetry-badge.inactive {
-      background: rgba(59, 130, 246, 0.2);
-      border-color: #3B82F6;
-      color: #93C5FD;
-    }
-
-    .vr-btn-control {
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: #FFFFFF;
-      padding: 6px 10px;
-      border-radius: 14px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-      touch-action: manipulation;
-    }
-
-    .vr-btn-control:hover, .vr-btn-control:focus {
-      background: #FF0055;
-      border-color: #FF88AA;
-      transform: scale(1.04);
-    }
-
-    .vr-btn-exit {
-      background: rgba(239, 68, 68, 0.85);
-      border-color: #EF4444;
-    }
-    .vr-btn-exit:hover {
-      background: #DC2626;
-    }
-
-    /* VR Gyro Permission Banner on screen in VR */
-    .vr-permission-cta {
-      position: absolute;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 20, 56, 0.95);
-      border: 2px solid var(--fcp-gold);
-      border-radius: 14px;
-      padding: 10px 18px;
-      z-index: 9999999;
+    .matchday-header-top {
       display: flex;
       align-items: center;
       gap: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
     }
 
-    .vr-permission-cta button {
-      background: #10B981;
+    .matchday-icon-circle {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #002B7F 0%, #001438 100%);
+      border: 1.5px solid var(--fcp-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 14px rgba(212, 175, 55, 0.3);
+      flex-shrink: 0;
+    }
+
+    .matchday-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 17px;
+      font-weight: 900;
+      color: #FFFFFF;
+      letter-spacing: 0.3px;
+    }
+
+    .matchday-subtitle {
+      font-size: 11.5px;
+      color: #93C5FD;
+      margin-top: 2px;
+    }
+
+    /* Tabs Bar */
+    .matchday-tabs-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    .matchday-tabs-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .matchday-tab-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #A0C4FF;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .matchday-tab-btn:hover {
+      background: rgba(0, 43, 127, 0.5);
+      border-color: rgba(212, 175, 55, 0.4);
+      color: #FFF;
+    }
+
+    .matchday-tab-btn.active {
+      background: linear-gradient(135deg, #002B7F 0%, #001F5C 100%);
+      border-color: var(--fcp-gold);
+      color: #FFE58F;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Tab Panes */
+    .matchday-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .matchday-pane {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      animation: tabFade 0.2s ease-in-out;
+    }
+    .matchday-pane.active {
+      display: flex;
+    }
+
+    @keyframes tabFade {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 🏟️ Gate Finder UI */
+    .gate-search-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px solid rgba(212, 175, 55, 0.35);
+      border-radius: 12px;
+      padding: 8px 14px;
+    }
+    .gate-search-input {
+      flex: 1;
+      background: transparent;
       border: none;
-      color: #000;
-      font-weight: 800;
-      padding: 6px 12px;
+      outline: none;
+      color: #FFF;
+      font-size: 13px;
+    }
+    .gate-search-input::placeholder {
+      color: #64748B;
+    }
+
+    .sector-filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .sector-chip {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #93C5FD;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 10px;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 12px;
+      transition: all 0.15s ease;
+    }
+    .sector-chip:hover, .sector-chip.active {
+      background: #002B7F;
+      border-color: var(--fcp-gold);
+      color: #FFE58F;
     }
 
-    /* VR Gaze Reticle Center Pointer */
-    .vr-reticle {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 18px;
-      height: 18px;
-      border: 2px solid rgba(255, 255, 255, 0.8);
-      border-radius: 50%;
-      z-index: 120;
-      pointer-events: none;
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+    .sectors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
     }
-    .vr-reticle::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 4px;
-      height: 4px;
-      background: #FF0055;
-      border-radius: 50%;
+
+    .sector-card {
+      background: rgba(0, 20, 56, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .sector-card:hover {
+      border-color: var(--fcp-gold);
+      background: rgba(0, 30, 80, 0.8);
+      transform: translateY(-2px);
+    }
+
+    .sector-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .sector-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #FFF;
+    }
+
+    .gate-badge {
+      background: var(--fcp-gold);
+      color: #001438;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .sector-detail-row {
+      font-size: 11.5px;
+      color: #A0C4FF;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1.4;
+    }
+
+    /* 🚇 Transport Planner */
+    .transport-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 640px) {
+      .transport-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .transport-card {
+      background: rgba(0, 20, 56, 0.65);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .transport-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .metro-lines-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .metro-pill {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 6px;
+      color: #FFF;
+    }
+
+    .transport-tip {
+      font-size: 11px;
+      color: #94A3B8;
+      line-height: 1.45;
+    }
+
+    /* 📅 Live Countdown & Next Matches */
+    .countdown-banner {
+      background: linear-gradient(135deg, #001F5C 0%, #001438 100%);
+      border: 1.5px solid var(--fcp-gold);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .countdown-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      color: #FFE58F;
+      letter-spacing: 0.5px;
+    }
+
+    .countdown-match-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 17px;
+      font-weight: 900;
+      color: #FFF;
+    }
+
+    .countdown-timer-units {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .countdown-unit {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 10px;
+      padding: 6px 12px;
+      min-width: 58px;
+    }
+    .countdown-val {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 20px;
+      font-weight: 900;
+      color: #FFF;
+    }
+    .countdown-lbl {
+      font-size: 9px;
+      color: #93C5FD;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .fixtures-table {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .fixture-row {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .fixture-teams {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #FFF;
+    }
+    .fixture-date {
+      font-size: 11px;
+      color: #93C5FD;
+    }
+    .fixture-badge {
+      background: rgba(0, 102, 255, 0.2);
+      border: 1px solid #0066FF;
+      color: #93C5FD;
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    /* 🏆 Quiz do Dragão */
+    .quiz-card {
+      background: rgba(0, 20, 56, 0.7);
+      border: 1.5px solid rgba(212, 175, 55, 0.3);
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 10px;
+    }
+
+    .quiz-question-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      color: #FFF;
+      line-height: 1.4;
+    }
+
+    .quiz-options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .quiz-opt-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #FFF;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .quiz-opt-btn:hover {
+      background: rgba(0, 43, 127, 0.6);
+      border-color: var(--fcp-gold);
+      transform: translateX(3px);
+    }
+    .quiz-opt-btn.correct {
+      background: rgba(16, 185, 129, 0.3);
+      border-color: #10B981;
+      color: #A7F3D0;
+    }
+    .quiz-opt-btn.wrong {
+      background: rgba(239, 68, 68, 0.3);
+      border-color: #EF4444;
+      color: #FCA5A5;
+    }
+
+    .quiz-feedback-box {
+      font-size: 12px;
+      line-height: 1.45;
+      padding: 10px 14px;
+      border-radius: 8px;
+      display: none;
     }
 
     /* Modals & Dialogs */
@@ -892,61 +1141,6 @@
 
     .modal-close-btn:hover {
       background: rgba(239, 68, 68, 0.6);
-    }
-
-    /* VR Launch Modal Styles */
-    .vr-modal-body {
-      padding: 24px 22px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .vr-modes-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      width: 100%;
-      margin-top: 6px;
-    }
-
-    .vr-mode-option {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1.5px solid rgba(255, 255, 255, 0.15);
-      border-radius: 12px;
-      padding: 16px 12px;
-      cursor: pointer;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s ease;
-    }
-
-    .vr-mode-option:hover {
-      background: rgba(255, 0, 85, 0.15);
-      border-color: #FF0055;
-      transform: translateY(-2px);
-    }
-
-    .vr-option-icon {
-      font-size: 28px;
-    }
-
-    .vr-option-title {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 13px;
-      font-weight: 800;
-      color: #FFF;
-    }
-
-    .vr-option-desc {
-      font-size: 10.5px;
-      color: #A0C4FF;
-      line-height: 1.35;
     }
 
     /* Google Auth & Digital Fan Card */
@@ -1160,6 +1354,210 @@
       cursor: pointer;
     }
 
+    /* 🔴 Flashscore Live Tracker Styles */
+    .btn-action.flashscore-btn {
+      background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
+      border: 1px solid #EF4444;
+      color: #FFF;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      animation: pulseLiveGlow 2.5s infinite;
+    }
+    .btn-action.flashscore-btn:hover {
+      background: linear-gradient(135deg, #EF4444 0%, #B91C1C 100%);
+      transform: translateY(-1px);
+    }
+
+    .btn-hud.flashscore-hud-btn {
+      background: rgba(220, 38, 38, 0.35);
+      border-color: #EF4444;
+      color: #FECACA;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-hud.flashscore-hud-btn:hover {
+      background: rgba(220, 38, 38, 0.6);
+      color: #FFF;
+    }
+
+    @keyframes pulseLiveGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      50% { box-shadow: 0 0 14px 2px rgba(239, 68, 68, 0.7); }
+    }
+
+    .live-pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #EF4444;
+      border: 1.5px solid #FFF;
+      border-radius: 50%;
+      display: inline-block;
+      animation: liveDotBlink 1.3s infinite ease-in-out;
+      flex-shrink: 0;
+    }
+    @keyframes liveDotBlink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(0.75); }
+    }
+
+    .flashscore-dialog {
+      background: #0B132B;
+      border: 1.5px solid #EF4444;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 980px;
+      height: 90vh;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .flashscore-header {
+      background: linear-gradient(90deg, #1C0505 0%, #450A0A 40%, #001F5C 100%);
+      border-bottom: 1.5px solid #EF4444;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .flashscore-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .flashscore-live-badge {
+      background: #EF4444;
+      color: #FFF;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
+    }
+
+    .flashscore-title-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      font-weight: 900;
+      color: #FFF;
+      letter-spacing: 0.2px;
+    }
+
+    .flashscore-subtitle-text {
+      font-size: 11.5px;
+      color: #FCA5A5;
+      margin-top: 2px;
+    }
+
+    .flashscore-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 40px;
+    }
+
+    .flashscore-btn-external {
+      background: #EF4444;
+      color: #FFF;
+      border: none;
+      padding: 7px 15px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+    .flashscore-btn-external:hover {
+      background: #DC2626;
+      transform: translateY(-1px);
+    }
+
+    .flashscore-btn-refresh {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #FFF;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.2s ease;
+    }
+    .flashscore-btn-refresh:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .flashscore-notice-bar {
+      background: rgba(239, 68, 68, 0.12);
+      border-bottom: 1px solid rgba(239, 68, 68, 0.25);
+      padding: 8px 18px;
+      font-size: 12px;
+      color: #FECACA;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .flashscore-iframe-container {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: #111827;
+    }
+
+    .flashscore-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    .flashscore-pane-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: rgba(220, 38, 38, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      padding: 10px 14px;
+      border-radius: 10px;
+    }
+
+    .flashscore-embedded-frame-wrap {
+      background: #111827;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1.5px solid #EF4444;
+      height: 480px;
+      width: 100%;
+    }
+
     /* Responsive Queries */
     @media (max-width: 900px) {
       .zones-sidebar {
@@ -1190,6 +1588,12 @@
       .stadium-chants-tray {
         display: none;
       }
+      .flashscore-dialog {
+        height: 95vh;
+      }
+      .flashscore-controls {
+        margin-right: 0;
+      }
     }
 
     @media (max-width: 600px) {
@@ -1202,9 +1606,6 @@
       .btn-action {
         padding: 6px 9px;
       }
-      .vr-modes-grid {
-        grid-template-columns: 1fr;
-      }
     }
   </style>
 </head>
@@ -1213,12 +1614,12 @@
   <div class="app-root">
     <!-- Mandatory Non-Affiliation Disclaimer Banner -->
     <div class="disclaimer-banner">
-      <span>⚠️ Aviso: Não somos afiliados do FC Porto, somos apenas adeptos! Visita virtual com Google Street View oficial, Museu FC Porto, Modo VR com Giroscópio 360° e Sons de Estádio.</span>
+      <span>⚠️ Aviso: Não somos afiliados do FC Porto, somos apenas adeptos! Visita virtual com Google Street View oficial, Flashscore em Direto (Vai ver se o Porto está a jogar!), Museu FC Porto, Guia de Dia de Jogo e Sons de Estádio.</span>
     </div>
 
     <!-- Top Navigation Header -->
     <header class="top-header">
-      <div class="brand-group" id="btn-brand-home" title="Estádio do Dragão - Street View & VR">
+      <div class="brand-group" id="btn-brand-home" title="Estádio do Dragão - Street View & Guia">
         <svg class="brand-logo-svg" viewBox="0 0 100 100">
           <path d="M 50 5 L 85 20 L 85 60 C 85 80 50 95 50 95 C 50 95 15 80 15 60 L 15 20 Z" fill="#002B7F" stroke="#D4AF37" stroke-width="3"/>
           <path d="M 38 20 L 38 80 M 62 20 L 62 80" stroke="#FFFFFF" stroke-width="8"/>
@@ -1228,27 +1629,27 @@
         <div class="brand-text">
           <div class="brand-title">
             <span>ESTÁDIO DO DRAGÃO</span>
-            <span class="brand-badge">360° VR GYRO</span>
+            <span class="brand-badge">GUIA & 360°</span>
           </div>
-          <div class="brand-subtitle">Street View • Museu FC Porto • Giroscópio 360°</div>
+          <div class="brand-subtitle">Street View • Flashscore • Museu FC Porto • Guia Dia de Jogo</div>
         </div>
       </div>
 
       <div class="header-actions">
+        <!-- 🔴 Flashscore: Vai ver se o Porto está a jogar! -->
+        <button class="btn-action flashscore-btn" id="btn-open-flashscore-modal" onclick="openFlashscoreModal()" title="Vai ver se o FC Porto está a jogar agora no Flashscore!">
+          <span class="live-pulse-dot"></span>
+          <span>Vai ver se o Porto está a jogar!</span>
+        </button>
+
+        <!-- 🏟️ Guia de Dia de Jogo, Portas & Transportes -->
+        <button class="btn-action matchday-btn" id="btn-open-matchday-modal" onclick="openMatchdayModal()" title="Abrir Guia de Dia de Jogo, Portas, Transportes e Quiz">
+          <span>⚽ Dia de Jogo & Acessos</span>
+        </button>
+
         <!-- 🏛️ Quick Jump to Museu FC Porto -->
         <button class="btn-action museum-quick-btn" onclick="selectZone('museu-fcporto')" title="Ir Diretamente ao Museu FC Porto by BMG">
           🏛️ <span>Museu do Porto</span>
-        </button>
-
-        <!-- 🥽 Universal VR Button with Gyroscope -->
-        <button class="btn-action vr-btn" id="btn-open-vr-modal" title="Ativar Modo VR com Giroscópio 360°">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="6" width="20" height="12" rx="4"></rect>
-            <circle cx="8" cy="12" r="2.5"></circle>
-            <circle cx="16" cy="12" r="2.5"></circle>
-            <path d="M11 15h2"></path>
-          </svg>
-          <span>Modo VR 🧭</span>
         </button>
 
         <!-- 🎙️ Narrador do Estádio (Web Speech API) -->
@@ -1346,7 +1747,7 @@
           </iframe>
         </div>
 
-        <!-- Floating Bottom HUD with zone details, VR trigger & direct Google Maps link -->
+        <!-- Floating Bottom HUD with zone details, Matchday trigger & direct Google Maps link -->
         <div class="stage-bottom-hud">
           <div class="hud-info-left">
             <div class="hud-zone-tag">
@@ -1360,6 +1761,12 @@
           </div>
 
           <div class="hud-actions-right">
+            <!-- 🔴 Flashscore: Vai ver se o Porto está a jogar! -->
+            <button class="btn-hud flashscore-hud-btn" onclick="openFlashscoreModal()" title="Vai ver se o FC Porto está a jogar agora no Flashscore!">
+              <span class="live-pulse-dot"></span>
+              <span>Vai ver se o Porto está a jogar!</span>
+            </button>
+
             <!-- 🎙️ Hear Zone History Narrator Trigger -->
             <button class="btn-hud narrator-hud-btn" id="btn-hud-read-zone" onclick="playZoneNarrationExplicit()" title="Ouvir História Deste Local com o Narrador IA">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1369,14 +1776,9 @@
               <span id="hud-narrate-btn-text">Ouvir História 🎙️</span>
             </button>
 
-            <!-- Launch VR directly from HUD with Gyroscope -->
-            <button class="btn-hud vr-hud-btn" onclick="openVRModal()" title="Entrar em Realidade Virtual com Giroscópio 360°">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="6" width="20" height="12" rx="4"></rect>
-                <circle cx="8" cy="12" r="2.5"></circle>
-                <circle cx="16" cy="12" r="2.5"></circle>
-              </svg>
-              <span>VR com Giroscópio 🧭</span>
+            <!-- Matchday & Gates Guide Trigger from HUD -->
+            <button class="btn-hud matchday-hud-btn" onclick="openMatchdayModal()" title="Abrir Guia de Portas de Acesso e Transportes">
+              <span>🏟️ Guia Dia de Jogo</span>
             </button>
 
             <button class="btn-hud" id="btn-fullscreen-toggle" title="Ecrã Completo">
@@ -1401,115 +1803,215 @@
   </div>
 
   <!-- ==========================================================================
-       UNIVERSAL VR 360° + THREE.JS GYROSCOPE FULLSCREEN VIEWPORT
+       MATCHDAY & VISITOR HUB MODAL (GATES, TRANSPORT, COUNTDOWN, QUIZ, MUSEUM, FLASHSCORE)
        ========================================================================== -->
-  <div class="vr-fullscreen-container" id="vr-stereo-container">
-    <div class="vr-viewport-sbs">
-      <!-- Left Eye / WebGL 3D Photosphere with Gyroscope -->
-      <div class="vr-eye-half" id="vr-left-eye">
-        <canvas id="vr-canvas-left" class="vr-webgl-canvas"></canvas>
-        <iframe id="vr-iframe-left" class="vr-eye-frame" src="about:blank" allowfullscreen></iframe>
-        <div class="vr-reticle"></div>
+  <div class="modal-backdrop" id="matchday-modal">
+    <div class="matchday-dialog">
+      <button class="modal-close-btn" onclick="closeMatchdayModal()">&times;</button>
+
+      <!-- Modal Header -->
+      <div class="matchday-header">
+        <div class="matchday-header-top">
+          <div class="matchday-icon-circle">🏟️</div>
+          <div>
+            <div class="matchday-title">Centro de Acesso & Dia de Jogo no Dragão</div>
+            <div class="matchday-subtitle">Portas de entrada, linhas de metro, contagem de jogo, Flashscore ao vivo e quiz</div>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="matchday-tabs-bar">
+          <button class="matchday-tab-btn active" onclick="switchMatchdayTab('tab-gates')">🚪 Portas & Setores</button>
+          <button class="matchday-tab-btn" onclick="switchMatchdayTab('tab-transport')">🚇 Como Chegar & Metro</button>
+          <button class="matchday-tab-btn" onclick="switchMatchdayTab('tab-flashscore')" style="color:#FCA5A5;">🔴 Vai ver se o Porto está a jogar!</button>
+          <button class="matchday-tab-btn" onclick="switchMatchdayTab('tab-quiz')">🏆 Quiz do Dragão</button>
+          <button class="matchday-tab-btn" onclick="switchMatchdayTab('tab-museum')">🏛️ Museu & Loja FC Porto</button>
+        </div>
       </div>
 
-      <!-- Center Alignment Divider for Headsets -->
-      <div class="vr-center-divider" id="vr-divider"></div>
+      <!-- Modal Body -->
+      <div class="matchday-body">
+        <!-- TAB 1: GATES & SECTORS FINDER -->
+        <div class="matchday-pane active" id="tab-gates">
+          <div class="gate-search-box">
+            <span style="font-size:16px;">🔍</span>
+            <input type="text" id="gate-search-input" class="gate-search-input" placeholder="Pesquisar por bancada, porta (ex: Porta 1) ou setor..." oninput="filterSectorsList(this.value)" />
+          </div>
 
-      <!-- Right Eye / WebGL 3D Photosphere with Gyroscope -->
-      <div class="vr-eye-half" id="vr-right-eye">
-        <canvas id="vr-canvas-right" class="vr-webgl-canvas"></canvas>
-        <iframe id="vr-iframe-right" class="vr-eye-frame" src="about:blank" allowfullscreen></iframe>
-        <div class="vr-reticle"></div>
+          <div class="sector-filter-chips">
+            <button class="sector-chip active" onclick="filterSectorCategory('all', this)">Todos os Setores</button>
+            <button class="sector-chip" onclick="filterSectorCategory('poente', this)">Bancada Poente (VIP/Tribuna)</button>
+            <button class="sector-chip" onclick="filterSectorCategory('nascente', this)">Bancada Nascente</button>
+            <button class="sector-chip" onclick="filterSectorCategory('norte', this)">Bancada Norte (Visitantes)</button>
+            <button class="sector-chip" onclick="filterSectorCategory('sul', this)">Bancada Sul (Super Dragões)</button>
+            <button class="sector-chip" onclick="filterSectorCategory('accessible', this)">♿ Mobilidade Reduzida</button>
+          </div>
+
+          <div class="sectors-grid" id="sectors-grid-container">
+            <!-- Dynamically populated from JS -->
+          </div>
+        </div>
+
+        <!-- TAB 2: TRANSPORT & HOW TO GET THERE -->
+        <div class="matchday-pane" id="tab-transport">
+          <div class="transport-grid">
+            <div class="transport-card">
+              <div class="transport-title">
+                <span>🚇 Metro do Porto</span>
+                <span class="gate-badge">Recomendado</span>
+              </div>
+              <div style="font-size:12px; color:#FFE58F; font-weight:700;">Estação "Estádio do Dragão" (Subterrânea)</div>
+              <div class="metro-lines-row">
+                <span class="metro-pill" style="background:#0055A5;">Linha A (Azul)</span>
+                <span class="metro-pill" style="background:#E30613;">Linha B (Vermelha)</span>
+                <span class="metro-pill" style="background:#00A859;">Linha C (Verde)</span>
+                <span class="metro-pill" style="background:#782B8F;">Linha E (Violeta / Aeroporto)</span>
+                <span class="metro-pill" style="background:#F39200;">Linha F (Laranja)</span>
+              </div>
+              <div class="transport-tip">
+                A estação de metro tem saída direta para a Praça do Dragão e para as bilheteiras. Em dias de jogo há comboios reforçados de 3 em 3 minutos após o apito final.
+              </div>
+            </div>
+
+            <div class="transport-card">
+              <div class="transport-title">
+                <span>🚌 Autocarros STCP</span>
+              </div>
+              <div style="font-size:12px; color:#FFE58F; font-weight:700;">Paragens: Estádio do Dragão / Corujeira</div>
+              <div class="metro-lines-row">
+                <span class="metro-pill" style="background:#002B7F; border:1px solid #3B82F6;">Linha 401</span>
+                <span class="metro-pill" style="background:#002B7F; border:1px solid #3B82F6;">Linha 700</span>
+                <span class="metro-pill" style="background:#002B7F; border:1px solid #3B82F6;">Linha 800</span>
+                <span class="metro-pill" style="background:#002B7F; border:1px solid #3B82F6;">Linha 801</span>
+                <span class="metro-pill" style="background:#002B7F; border:1px solid #3B82F6;">Linha 806</span>
+              </div>
+              <div class="transport-tip">
+                Ligações diretas com a Baixa do Porto (Bolhão, Trindade), Rio Tinto, Gondomar e Valongo.
+              </div>
+            </div>
+
+            <div class="transport-card">
+              <div class="transport-title">
+                <span>🚗 Carro & Estacionamento</span>
+              </div>
+              <div class="transport-tip" style="color:#FFF;">
+                • <strong>Alameda Shop & Spot:</strong> Parque coberto com acesso pedonal direto ao estádio.<br/>
+                • <strong>Parque P1/P2/P3:</strong> Reservado a camarotes, sócios com lugar de garagem e imprensa.<br/>
+                • <strong>Acessos rodoviários:</strong> VCI (Via de Cintura Interna), saída "Estádio / Alameda".
+              </div>
+            </div>
+
+            <div class="transport-card">
+              <div class="transport-title">
+                <span>✈️ Aeroporto Francisco Sá Carneiro</span>
+              </div>
+              <div class="transport-tip" style="color:#FFF;">
+                • <strong>Metro Linha E:</strong> Viagem direta de 25 minutos do Aeroporto até à estação Estádio do Dragão sem necessidade de transbordo.<br/>
+                • <strong>Táxi / TVDE:</strong> Cerca de 15 minutos via VCI (14 km).
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: FLASHSCORE FC PORTO LIVE EMBED -->
+        <div class="matchday-pane" id="tab-flashscore">
+          <div class="flashscore-pane-banner">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="flashscore-live-badge"><span class="live-pulse-dot"></span> EM DIRETO</span>
+              <div style="font-family:'Montserrat',sans-serif; font-size:14px; font-weight:900; color:#FFF;">
+                Vai ver se o Porto está a jogar!
+              </div>
+            </div>
+            <a href="https://www.flashscore.pt/equipa/fc-porto/S2NmScGp/" target="_blank" rel="noopener noreferrer" class="flashscore-btn-external">
+              Abrir no Flashscore.pt ↗
+            </a>
+          </div>
+          <div class="flashscore-embedded-frame-wrap">
+            <iframe
+              src="https://www.flashscore.pt/equipa/fc-porto/S2NmScGp/"
+              class="flashscore-iframe"
+              loading="lazy"
+              allow="fullscreen"
+              title="Flashscore FC Porto - Vai ver se o Porto está a jogar!">
+            </iframe>
+          </div>
+        </div>
+
+        <!-- TAB 5: MUSEUM & VISITOR INFO -->
+        <div class="matchday-pane" id="tab-museum">
+          <div class="transport-grid">
+            <div class="transport-card">
+              <div class="transport-title">
+                <span>🏛️ Museu FC Porto by BMG</span>
+              </div>
+              <div class="transport-tip" style="color:#FFF;">
+                • <strong>Horário normal:</strong> Terça a Domingo das 10h00 às 19h00 (Segundas das 14h30 às 19h00).<br/>
+                • <strong>Dia de jogo:</strong> Aberto até ao início do jogo.<br/>
+                • <strong>Atrações:</strong> 2 Taças dos Campeões/Champions League, Taça UEFA/Europa League, 2 Taças Intercontinentais, estátuas dos capitães e holograma de Pinto da Costa.
+              </div>
+              <button class="btn-action" onclick="closeMatchdayModal(); selectZone('museu-fcporto');" style="background:#002B7F; border:1px solid var(--fcp-gold); color:#FFE58F; width:100%; justify-content:center;">
+                Explorar Museu no Street View 360° ▶
+              </button>
+            </div>
+
+            <div class="transport-card">
+              <div class="transport-title">
+                <span>🛍️ FC Porto Store & Serviços</span>
+              </div>
+              <div class="transport-tip" style="color:#FFF;">
+                • <strong>FC Porto Store Estádio:</strong> Situada na Praça do Dragão junto ao Museu.<br/>
+                • <strong>Loja do Associado:</strong> Atendimento a sócios, pagamento de quotas e bilheteira central.<br/>
+                • <strong>Espaço Dragão Force:</strong> Informações sobre a escola de futebol para jovens.
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-
-    <!-- In-Headset Floating VR Controls -->
-    <div class="vr-inheadset-hud">
-      <div class="vr-hud-item">
-        <span>🥽 VR:</span>
-        <span id="vr-hud-current-zone" style="color:#FFF; font-weight:800;">Praça do Dragão</span>
-      </div>
-
-      <!-- Real-time Gyroscope Sensor Status Badge -->
-      <div class="vr-gyro-telemetry-badge" id="vr-gyro-status-badge">
-        <span id="vr-gyro-badge-label">🧭 360° Rastreio:</span>
-        <span id="vr-gyro-angles-text">0° / 0° / 0°</span>
-      </div>
-
-      <button class="vr-btn-control" onclick="prevVRZone()" title="Zona Anterior">◀ Anterior</button>
-      <button class="vr-btn-control" onclick="nextVRZone()" title="Próxima Zona">Próxima ▶</button>
-      <button class="vr-btn-control" onclick="recenterVRView()" title="Recentrar Olhar 360° para a Frente">🎯 Recentrar</button>
-      <button class="vr-btn-control" onclick="toggleVRStereoSplit()" id="btn-vr-split-toggle" title="Alternar entre Óculos VR (2 Ecrãs SBS) e Ecrã Único (Handheld)">🥽 2 Ecrãs (SBS)</button>
-      <button class="vr-btn-control" onclick="toggleVRViewMode()" id="btn-vr-mode-toggle" title="Alternar entre 3D WebGL e Google Street View">🔄 3D Gyro</button>
-      <button class="vr-btn-control" onclick="playZoneNarrationExplicit()" id="btn-vr-narrate" title="Ouvir História Narrada">🎙️ Narrar</button>
-      <button class="vr-btn-control" onclick="toggleStadiumAudioInVR()" id="btn-vr-audio-toggle" title="Som de Estádio">🔊 Som: ON</button>
-      <button class="vr-btn-control vr-btn-exit" onclick="exitVRMode()" title="Sair do Modo VR">❌ Sair</button>
-    </div>
-
-    <!-- Mobile Gyroscope Permission Dialog / CTA if needed -->
-    <div class="vr-permission-cta" id="vr-permission-prompt" style="display:none;">
-      <span style="font-size:12px; font-weight:700; color:#FFE58F;">📱 Ativar Rastreio por Giroscópio para olhar em 360° ao mover o telemóvel</span>
-      <button onclick="requestGyroPermissionExplicit()">Autorizar Giroscópio</button>
     </div>
   </div>
 
-  <!-- VR Setup & Mode Selection Modal -->
-  <div class="modal-backdrop" id="vr-select-modal">
-    <div class="modal-dialog">
-      <button class="modal-close-btn" id="btn-close-vr-modal">&times;</button>
+  <!-- ==========================================================================
+       FLASHSCORE LIVE MODAL: VAI VER SE O PORTO ESTÁ A JOGAR!
+       ========================================================================== -->
+  <div class="modal-backdrop" id="flashscore-modal">
+    <div class="flashscore-dialog">
+      <button class="modal-close-btn" onclick="closeFlashscoreModal()">&times;</button>
       
-      <div class="vr-modal-body">
-        <div style="width:48px; height:48px; border-radius:50%; background:#FF0055; display:flex; align-items:center; justify-content:center; box-shadow:0 0 16px rgba(255,0,85,0.6);">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2">
-            <rect x="2" y="6" width="20" height="12" rx="4"></rect>
-            <circle cx="8" cy="12" r="2.5"></circle>
-            <circle cx="16" cy="12" r="2.5"></circle>
-            <path d="M11 15h2"></path>
-          </svg>
-        </div>
-
-        <div>
-          <h2 style="font-family:'Montserrat',sans-serif; font-size:17px; font-weight:900; color:#FFF;">
-            Modo VR com Giroscópio 360°
-          </h2>
-          <p style="font-size:12px; color:#A0C4FF; margin-top:4px;">
-            Compatível com todos os óculos VR (Cardboard, VR Box, Quest, Vision Pro) e telemóveis com sensores de orientação.
-          </p>
-        </div>
-
-        <div class="vr-modes-grid">
-          <!-- Option 1: Cardboard / Mobile VR / VR Box / Stereoscopic Split-Screen with Gyroscope -->
-          <div class="vr-mode-option" onclick="launchStereoVRMode(true)">
-            <div class="vr-option-icon">🥽</div>
-            <div class="vr-option-title">Óculos VR com Giroscópio (SBS)</div>
-            <div class="vr-option-desc">Visão dividida lado a lado com rastreio de cabeça 360° por giroscópio para Cardboard, BoboVR e VR Box.</div>
-          </div>
-
-          <!-- Option 2: Fullscreen Gyroscope (Handheld 360°) -->
-          <div class="vr-mode-option" onclick="launchGyroscopeMode()">
-            <div class="vr-option-icon">📱</div>
-            <div class="vr-option-title">360° Giroscópio na Mão</div>
-            <div class="vr-option-desc">Move o telemóvel livremente no ar para olhar em 360° em qualquer direção sem precisar de óculos.</div>
-          </div>
-
-          <!-- Option 3: Meta Quest / Vision Pro / WebXR Immersive -->
-          <div class="vr-mode-option" onclick="launchWebXRImmersive()">
-            <div class="vr-option-icon">🎮</div>
-            <div class="vr-option-title">Meta Quest / Vision Pro / WebXR</div>
-            <div class="vr-option-desc">Sessão VR Imersiva com rastreio de cabeça nativo de 6 graus de liberdade.</div>
-          </div>
-
-          <!-- Option 4: Sound Atmosphere in VR -->
-          <div class="vr-mode-option" onclick="startAudioAndLaunchVR()">
-            <div class="vr-option-icon">🔊</div>
-            <div class="vr-option-title">VR + Sons do Dragão</div>
-            <div class="vr-option-desc">Inicia a experiência imersiva com a atmosfera e os cânticos de 50.000 adeptos a cantar.</div>
+      <div class="flashscore-header">
+        <div class="flashscore-title-wrap">
+          <span class="flashscore-live-badge">
+            <span class="live-pulse-dot"></span> AO VIVO
+          </span>
+          <div>
+            <div class="flashscore-title-text">Vai ver se o Porto está a jogar!</div>
+            <div class="flashscore-subtitle-text">Flashscore • Resultados em direto, golos, onzes titulares, calendário e classificação do FC Porto</div>
           </div>
         </div>
 
-        <div style="font-size:10.5px; color:rgba(255,255,255,0.6); margin-top:6px;">
-          💡 Dica: No iPhone (Safari) e Android (Chrome), clica em "Autorizar Giroscópio" quando solicitado para rotação 360° automática.
+        <div class="flashscore-controls">
+          <button class="flashscore-btn-refresh" onclick="refreshFlashscoreIframe()" title="Recarregar Flashscore">
+            🔄 Atualizar
+          </button>
+          <a href="https://www.flashscore.pt/equipa/fc-porto/S2NmScGp/" target="_blank" rel="noopener noreferrer" class="flashscore-btn-external" title="Abrir página do FC Porto no Flashscore em nova janela">
+            Abrir no Flashscore ↗
+          </a>
         </div>
+      </div>
+
+      <div class="flashscore-notice-bar">
+        <span>⚡ <strong>Acompanhamento em Direto:</strong> Vê se o FC Porto está em campo agora, os resultados dos últimos jogos e os próximos desafios no Dragão.</span>
+        <span style="font-size:11px; opacity:0.85;">Fonte: Flashscore.pt (FC Porto)</span>
+      </div>
+
+      <div class="flashscore-iframe-container">
+        <iframe
+          id="flashscore-main-iframe"
+          class="flashscore-iframe"
+          src="https://www.flashscore.pt/equipa/fc-porto/S2NmScGp/"
+          title="Flashscore FC Porto - Vai ver se o Porto está a jogar!"
+          loading="lazy"
+          allow="fullscreen">
+        </iframe>
       </div>
     </div>
   </div>
@@ -1728,48 +2230,183 @@
     let currentZoneIndex = 0;
     let currentZone = REAL_DRAGAO_ZONES[0];
     let isUserLoggedIn = false;
-    let isVRActive = false;
-    let vrViewMode = '3d-gyro'; // '3d-gyro' or 'streetview'
-    let isStereoSplit = true;
 
     // Stadium Narrator (Web Speech API) State
-    let isNarratorEnabled = true; // Auto-narrate on zone change if enabled
+    let isNarratorEnabled = true;
     let isSpeakingNarration = false;
     let currentUtterance = null;
     let cachedVoices = [];
 
-    // Gyroscope & Screen Orientation tracking
-    let gyroSupported = false;
-    let gyroActive = false;
-    let hasRealGyroSignal = false;
-    let gyroAlpha = 0; // Z / Yaw
-    let gyroBeta = 90; // X / Pitch
-    let gyroGamma = 0; // Y / Roll
-    let baseZeroAlpha = 0;
-    let screenOrientationAngle = 0;
+    /* ==========================================================================
+       REAL ESTÁDIO DO DRAGÃO SECTORS & ACCESS GATES DIRECTORY
+       ========================================================================== */
+    const REAL_DRAGAO_SECTORS = [
+      {
+        id: "sec-poente-central",
+        name: "Bancada Poente Central (Piso 0 / 1)",
+        category: "poente",
+        gates: "Portas 1, 2 e 3",
+        turnstiles: "Torniquetes A1 - A6",
+        features: ["Visão Nobre Lateral", "Bancos de Suplentes", "Acesso a Túnel dos Jogadores"],
+        accessibility: "Elevador dedicado e rampa na Porta 1"
+      },
+      {
+        id: "sec-tribuna-vip",
+        name: "Tribuna VIP & Camarotes Poente",
+        category: "poente",
+        gates: "Portas 1 e 2 (Entrada VIP)",
+        turnstiles: "Check-in VIP Dedicado",
+        features: ["Catering Exclusivo", "Camarotes Corporativos", "Lugares de Garagem P1"],
+        accessibility: "Acesso direto por elevador VIP"
+      },
+      {
+        id: "sec-poente-arquibancada",
+        name: "Arquibancada Poente (Piso 3)",
+        category: "poente",
+        gates: "Portas 4 e 5",
+        turnstiles: "Torniquetes A7 - A12",
+        features: ["Visão Panorâmica Ampla", "Sob a Cobertura Translúcida", "Bares de Apoio"],
+        accessibility: "Elevadores disponíveis na Praça Poente"
+      },
+      {
+        id: "sec-nascente-central",
+        name: "Bancada Nascente Central (Piso 0 / 1)",
+        category: "nascente",
+        gates: "Portas 13, 14 e 15",
+        turnstiles: "Torniquetes C1 - C8",
+        features: ["Frente para a Bancada Presidencial", "Visão Perfeita do Relvado", "Zona Familiar"],
+        accessibility: "Acesso sem degraus pela Porta 14"
+      },
+      {
+        id: "sec-nascente-arquibancada",
+        name: "Arquibancada Nascente (Piso 3)",
+        category: "nascente",
+        gates: "Portas 11, 12 e 16",
+        turnstiles: "Torniquetes C9 - C16",
+        features: ["Ponto Mais Elevado da Nascente", "Vista sobre a Cidade e VCI", "Ecrã Gigante"],
+        accessibility: "Elevadores laterais na Alameda"
+      },
+      {
+        id: "sec-topo-sul-claques",
+        name: "Topo Sul • Setores 8 a 12 (Super Dragões / Colectivo)",
+        category: "sul",
+        gates: "Portas 19, 20 e 21",
+        turnstiles: "Torniquetes D1 - D10",
+        features: ["Coração da Animação & Cânticos", "Coreografias do Mar Azul", "Ambiente de Alta Intensidade"],
+        accessibility: "Acesso por rampa na Porta 19"
+      },
+      {
+        id: "sec-topo-sul-arquibancada",
+        name: "Arquibancada Sul (Piso 3)",
+        category: "sul",
+        gates: "Portas 22 e 23",
+        turnstiles: "Torniquetes D11 - D16",
+        features: ["Vista Aérea da Baliza Sul", "Visão Direta para a Bancada Norte"],
+        accessibility: "Acesso via escadarias e elevador sul"
+      },
+      {
+        id: "sec-topo-norte-visitantes",
+        name: "Topo Norte • Setor Visitante (Caixa de Segurança)",
+        category: "norte",
+        gates: "Porta 27 (Acesso Visitantes)",
+        turnstiles: "Torniquetes B1 - B6",
+        features: ["Rede de Proteção Regulamentar", "Corredor de Segurança Dedicado", "Bilheteira de Visitante"],
+        accessibility: "Entrada segregada pela Alameda das Antas"
+      },
+      {
+        id: "sec-topo-norte-familiar",
+        name: "Topo Norte • Bancada Familiar (Piso 0 / 1)",
+        category: "norte",
+        gates: "Portas 24, 25 e 26",
+        turnstiles: "Torniquetes B7 - B12",
+        features: ["Bancada Dragãozinho", "Atividades para Crianças", "Mascote Draco"],
+        accessibility: "Totalmente adaptado para carrinhos e cadeiras"
+      },
+      {
+        id: "sec-mobilidade-pMR",
+        name: "Setor para Mobilidade Reduzida (PMR)",
+        category: "accessible",
+        gates: "Portas 1, 14 e 19",
+        turnstiles: "Acesso Prioritário Sem Barreiras",
+        features: ["Lugares Reservados para Cadeiras de Rodas", "Lugar Gratuito para Acompanhante", "Casas de Banho Adaptadas"],
+        accessibility: "100% Acessível com rampas suaves e elevadores amplos"
+      }
+    ];
 
-    // Manual Touch / Mouse / Keyboard look controls
-    let isUserInteracting = false;
-    let onPointerDownPointerX = 0, onPointerDownPointerY = 0;
-    let onPointerDownLon = 0, onPointerDownLat = 0;
-    let lon = 0, lat = 0;
-    let cameraFov = 75;
+    /* ==========================================================================
+       DRAGÃO TRIVIA QUIZ DATA
+       ========================================================================== */
+    const DRAGAO_QUIZ_DATA = [
+      {
+        question: "Em que data e contra que clube foi inaugurado o Estádio do Dragão?",
+        options: [
+          "16 de Novembro de 2003, contra o FC Barcelona",
+          "28 de Maio de 2004, contra o AS Monaco",
+          "22 de Outubro de 2002, contra a Lazio",
+          "12 de Agosto de 2003, contra o Real Madrid"
+        ],
+        correct: 0,
+        explanation: "O Estádio do Dragão foi inaugurado a 16 de Novembro de 2003 numa vitória por 2-0 frente ao Barcelona, jogo em que Lionel Messi fez a sua estreia pela equipa sénior catalã."
+      },
+      {
+        question: "Qual é a lotação oficial do Estádio do Dragão?",
+        options: [
+          "45.000 espetadores",
+          "50.033 espetadores",
+          "55.500 espetadores",
+          "62.000 espetadores"
+        ],
+        correct: 1,
+        explanation: "O Estádio do Dragão tem uma capacidade exata para 50.033 espetadores, todos sentados e cobertos pela icónica pala translúcida."
+      },
+      {
+        question: "Quem foi o arquiteto responsável pelo projeto do Estádio do Dragão?",
+        options: [
+          "Álvaro Siza Vieira",
+          "Eduardo Souto de Moura",
+          "Manuel Salgado",
+          "Tomás Taveira"
+        ],
+        correct: 2,
+        explanation: "O Estádio do Dragão foi desenhado pelo conceituado arquiteto Manuel Salgado, integrando uma inovadora estrutura com 280 toneladas de aço e painéis translúcidos."
+      },
+      {
+        question: "Quantos títulos europeus e intercontinentais seniores masculinos tem o FC Porto no seu palmarés?",
+        options: [
+          "4 títulos",
+          "5 títulos",
+          "7 títulos (2 Champions, 2 Intercontinentais, 2 Europa Leagues/UEFA, 1 Supertaça Europeia)",
+          "9 títulos"
+        ],
+        correct: 2,
+        explanation: "O FC Porto conquistou 7 troféus internacionais: Taça dos Campeões 1987, Champions League 2004, Taça UEFA 2003, Liga Europa 2011, Supertaça Europeia 1987 e 2 Taças Intercontinentais (1987 e 2004)."
+      },
+      {
+        question: "Qual é a linha de Metro do Porto que liga diretamente o Aeroporto ao Estádio do Dragão?",
+        options: [
+          "Linha A (Azul)",
+          "Linha D (Amarela)",
+          "Linha E (Violeta)",
+          "Linha B (Vermelha)"
+        ],
+        correct: 2,
+        explanation: "A Linha E (Violeta) do Metro do Porto faz o trajeto direto entre a estação do Aeroporto Francisco Sá Carneiro e a estação subterrânea do Estádio do Dragão em cerca de 25 minutos."
+      }
+    ];
 
-    // Three.js VR Engine instances
-    let rendererLeft = null, rendererRight = null;
-    let sceneLeft = null, sceneRight = null;
-    let cameraLeft = null, cameraRight = null;
-    let meshLeft = null, meshRight = null;
-    let animFrameId = null;
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+    let quizAnswered = false;
 
     // Initialize DOM
     document.addEventListener('DOMContentLoaded', () => {
       buildZonesList();
-      selectZone(REAL_DRAGAO_ZONES[0].id, false); // initial without auto-speaking before interaction
+      selectZone(REAL_DRAGAO_ZONES[0].id, false);
       setupEventListeners();
-      initGyroscopeListener();
       initSpeechVoices();
-      updateScreenOrientationAngle();
+      renderSectors(REAL_DRAGAO_SECTORS);
+      startMatchdayCountdown();
+      loadQuizQuestion();
     });
 
     function buildZonesList() {
@@ -1825,18 +2462,7 @@
       const iframe = document.getElementById('streetview-iframe');
       iframe.src = zone.embedUrl;
 
-      // Update In-VR HUD
-      const vrZoneLabel = document.getElementById('vr-hud-current-zone');
-      if (vrZoneLabel) vrZoneLabel.textContent = zone.name;
-
-      // If VR is open, update 3D texture and dual eye iframes
-      if (isVRActive) {
-        updateVRPhotosphereTexture(zone);
-        document.getElementById('vr-iframe-left').src = zone.embedUrl;
-        document.getElementById('vr-iframe-right').src = zone.embedUrl;
-      }
-
-      // 🎙️ Auto Narrate with Web Speech API if enabled and triggered by user action
+      // Auto Narrate with Web Speech API if enabled and triggered by user action
       if (triggerNarration && isNarratorEnabled) {
         speakZoneDescription(zone);
       }
@@ -1846,18 +2472,23 @@
       // Toggle sidebar on mobile
       const sidebarToggle = document.getElementById('btn-toggle-sidebar');
       const sidebar = document.getElementById('zones-sidebar');
-      sidebarToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
-      });
+      if (sidebarToggle && sidebar) {
+        sidebarToggle.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+        });
+      }
 
       // Fullscreen toggle
-      document.getElementById('btn-fullscreen-toggle').addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen().catch(() => {});
-        } else {
-          document.exitFullscreen().catch(() => {});
-        }
-      });
+      const fsToggle = document.getElementById('btn-fullscreen-toggle');
+      if (fsToggle) {
+        fsToggle.addEventListener('click', () => {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+          } else {
+            document.exitFullscreen().catch(() => {});
+          }
+        });
+      }
 
       // Narrator Toggle Button in Header
       const narratorToggle = document.getElementById('btn-toggle-narrator');
@@ -1866,22 +2497,26 @@
       }
 
       // Audio Toggle Button in Header
-      document.getElementById('btn-toggle-stadium-audio').addEventListener('click', toggleStadiumAudio);
-
-      // VR Modal Button
-      document.getElementById('btn-open-vr-modal').addEventListener('click', openVRModal);
-      document.getElementById('btn-close-vr-modal').addEventListener('click', closeVRModal);
+      const audioToggle = document.getElementById('btn-toggle-stadium-audio');
+      if (audioToggle) {
+        audioToggle.addEventListener('click', toggleStadiumAudio);
+      }
 
       // Google Auth Modal
-      document.getElementById('btn-open-auth-modal').addEventListener('click', openAuthModal);
-      document.getElementById('btn-close-auth').addEventListener('click', closeAuthModal);
-      document.getElementById('btn-do-google-login').addEventListener('click', handleGoogleLogin);
+      const authBtn = document.getElementById('btn-open-auth-modal');
+      const authClose = document.getElementById('btn-close-auth');
+      const loginBtn = document.getElementById('btn-do-google-login');
+      if (authBtn) authBtn.addEventListener('click', openAuthModal);
+      if (authClose) authClose.addEventListener('click', closeAuthModal);
+      if (loginBtn) loginBtn.addEventListener('click', handleGoogleLogin);
 
       // AI Guide Modal
-      document.getElementById('btn-open-ai-modal').addEventListener('click', openAIModal);
-      document.getElementById('btn-close-ai').addEventListener('click', closeAIModal);
+      const aiBtn = document.getElementById('btn-open-ai-modal');
+      const aiClose = document.getElementById('btn-close-ai');
+      if (aiBtn) aiBtn.addEventListener('click', openAIModal);
+      if (aiClose) aiClose.addEventListener('click', closeAIModal);
 
-      // Close modal on click outside
+      // Close modal on click outside backdrop
       document.querySelectorAll('.modal-backdrop').forEach(modal => {
         modal.addEventListener('click', (e) => {
           if (e.target === modal) {
@@ -1889,590 +2524,282 @@
           }
         });
       });
-
-      // Pointer controls on VR container for manual look / drag
-      const vrContainer = document.getElementById('vr-stereo-container');
-      vrContainer.addEventListener('pointerdown', onPointerDown, false);
-      window.addEventListener('pointermove', onPointerMove, false);
-      window.addEventListener('pointerup', onPointerUp, false);
-      window.addEventListener('pointercancel', onPointerUp, false);
-
-      // Touch events for mobile VR interaction
-      vrContainer.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) {
-          onPointerDownPointerX = e.touches[0].pageX;
-          onPointerDownPointerY = e.touches[0].pageY;
-          onPointerDownLon = lon;
-          onPointerDownLat = lat;
-          isUserInteracting = true;
-        }
-      }, { passive: true });
-
-      vrContainer.addEventListener('touchmove', (e) => {
-        if (isUserInteracting && e.touches.length === 1) {
-          lon = (onPointerDownPointerX - e.touches[0].pageX) * 0.2 + onPointerDownLon;
-          lat = (e.touches[0].pageY - onPointerDownPointerY) * 0.2 + onPointerDownLat;
-          lat = Math.max(-85, Math.min(85, lat));
-        }
-      }, { passive: true });
-
-      vrContainer.addEventListener('touchend', () => {
-        isUserInteracting = false;
-      }, { passive: true });
-
-      // Mouse Wheel Zoom (adjust FOV in VR)
-      vrContainer.addEventListener('wheel', (e) => {
-        if (!isVRActive) return;
-        cameraFov = Math.max(40, Math.min(95, cameraFov + (e.deltaY > 0 ? 3 : -3)));
-        if (cameraLeft) {
-          cameraLeft.fov = cameraFov;
-          cameraLeft.updateProjectionMatrix();
-        }
-        if (cameraRight) {
-          cameraRight.fov = cameraFov;
-          cameraRight.updateProjectionMatrix();
-        }
-      }, { passive: true });
-
-      // Keyboard Controls for Desktop VR navigation
-      window.addEventListener('keydown', (e) => {
-        if (!isVRActive) return;
-        if (e.key === 'Escape') {
-          exitVRMode();
-        } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
-          lon -= 3;
-        } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
-          lon += 3;
-        } else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
-          lat = Math.min(85, lat + 2.5);
-        } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
-          lat = Math.max(-85, lat - 2.5);
-        } else if (e.key === ' ' || e.code === 'Space') {
-          if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-            e.preventDefault();
-            playZoneNarrationExplicit();
-          }
-        }
-      });
-
-      // Window Resize & Screen Orientation Change
-      window.addEventListener('resize', handleVRResize);
-      window.addEventListener('orientationchange', () => {
-        updateScreenOrientationAngle();
-        setTimeout(handleVRResize, 150);
-      });
-      document.addEventListener('fullscreenchange', handleVRResize);
-    }
-
-    function updateScreenOrientationAngle() {
-      if (window.screen && window.screen.orientation && typeof window.screen.orientation.angle === 'number') {
-        screenOrientationAngle = window.screen.orientation.angle;
-      } else if (typeof window.orientation === 'number') {
-        screenOrientationAngle = window.orientation;
-      } else {
-        screenOrientationAngle = 0;
-      }
-    }
-
-    function onPointerDown(event) {
-      if (!isVRActive || event.isPrimary === false) return;
-      // If clicking directly on a button in HUD, don't trigger drag
-      if (event.target.closest('.vr-inheadset-hud') || event.target.closest('.vr-permission-cta')) return;
-      isUserInteracting = true;
-      onPointerDownPointerX = event.clientX;
-      onPointerDownPointerY = event.clientY;
-      onPointerDownLon = lon;
-      onPointerDownLat = lat;
-    }
-
-    function onPointerMove(event) {
-      if (!isVRActive || event.isPrimary === false || !isUserInteracting) return;
-      lon = (onPointerDownPointerX - event.clientX) * 0.18 + onPointerDownLon;
-      lat = (event.clientY - onPointerDownPointerY) * 0.18 + onPointerDownLat;
-      lat = Math.max(-85, Math.min(85, lat));
-    }
-
-    function onPointerUp(event) {
-      isUserInteracting = false;
-    }
-
-    function recenterVRView() {
-      baseZeroAlpha = gyroAlpha;
-      lon = 0;
-      lat = 0;
     }
 
     /* ==========================================================================
-       GYROSCOPE / DEVICE ORIENTATION SENSORS (THREE.JS COMPATIBLE)
+       FLASHSCORE LIVE MODAL LOGIC (VAI VER SE O PORTO ESTÁ A JOGAR!)
        ========================================================================== */
-    function initGyroscopeListener() {
-      if ('ondeviceorientation' in window || window.DeviceOrientationEvent) {
-        window.addEventListener('deviceorientation', onDeviceOrientationChange, true);
-        window.addEventListener('deviceorientationabsolute', onDeviceOrientationChange, true);
-        gyroSupported = true;
+    function openFlashscoreModal() {
+      const modal = document.getElementById('flashscore-modal');
+      if (modal) {
+        modal.classList.add('open');
       }
     }
 
-    async function requestGyroPermissionExplicit() {
-      // 1. Generic Permissions API check (Chrome/Android/Sensors)
-      if (navigator.permissions && navigator.permissions.query) {
-        try {
-          const result = await navigator.permissions.query({ name: 'accelerometer' });
-          if (result.state === 'granted') {
-            gyroActive = true;
-          }
-        } catch (e) {}
-        try {
-          const resultGyro = await navigator.permissions.query({ name: 'gyroscope' });
-          if (resultGyro.state === 'granted') {
-            gyroActive = true;
-          }
-        } catch (e) {}
-      }
-
-      // 2. iOS 13+ DeviceOrientationEvent.requestPermission API
-      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        try {
-          const permissionState = await DeviceOrientationEvent.requestPermission();
-          if (permissionState === 'granted') {
-            window.addEventListener('deviceorientation', onDeviceOrientationChange, true);
-            window.addEventListener('deviceorientationabsolute', onDeviceOrientationChange, true);
-            gyroActive = true;
-            document.getElementById('vr-permission-prompt').style.display = 'none';
-            updateGyroBadge(true);
-          } else {
-            console.warn("Permissão de giroscópio recusada no dispositivo.");
-          }
-        } catch (err) {
-          console.error("Erro ao pedir permissão de orientação:", err);
-        }
-      } else {
-        // Standard Android / Web standard DeviceOrientation listener
-        window.addEventListener('deviceorientation', onDeviceOrientationChange, true);
-        window.addEventListener('deviceorientationabsolute', onDeviceOrientationChange, true);
-        document.getElementById('vr-permission-prompt').style.display = 'none';
+    function closeFlashscoreModal() {
+      const modal = document.getElementById('flashscore-modal');
+      if (modal) {
+        modal.classList.remove('open');
       }
     }
 
-    function onDeviceOrientationChange(event) {
-      if (event.alpha !== null && event.beta !== null) {
-        // Confirm real hardware sensor activity
-        const isReal = Math.abs(event.alpha) > 0.0001 || Math.abs(event.beta) > 0.0001 || Math.abs(event.gamma || 0) > 0.0001;
-        if (isReal) {
-          hasRealGyroSignal = true;
-          gyroActive = true;
-        }
-        gyroAlpha = event.alpha || 0;
-        gyroBeta = event.beta || 0;
-        gyroGamma = event.gamma || 0;
-
-        // Update real-time angles text in HUD
-        const anglesEl = document.getElementById('vr-gyro-angles-text');
-        if (anglesEl) {
-          anglesEl.textContent = `Y:${Math.round(gyroAlpha)}° P:${Math.round(gyroBeta)}° R:${Math.round(gyroGamma)}°`;
-        }
-        updateGyroBadge(hasRealGyroSignal && gyroActive);
-      }
-    }
-
-    function updateGyroBadge(active) {
-      const badge = document.getElementById('vr-gyro-status-badge');
-      const label = document.getElementById('vr-gyro-badge-label');
-      if (badge) {
-        badge.classList.toggle('inactive', !active);
-      }
-      if (label) {
-        label.textContent = active ? '🧭 Giroscópio Ativo:' : '🖱️ Rastreio 360°:';
+    function refreshFlashscoreIframe() {
+      const iframe = document.getElementById('flashscore-main-iframe');
+      if (iframe) {
+        const currentSrc = iframe.src;
+        iframe.src = '';
+        setTimeout(() => {
+          iframe.src = currentSrc;
+        }, 100);
       }
     }
 
     /* ==========================================================================
-       THREE.JS WEBGL 3D PHOTOSPHERE PANORAMAS ENGINE
+       MATCHDAY HUB & SECTORS LOGIC
        ========================================================================== */
-    function createProceduralPhotosphere(zone) {
-      const canvas = document.createElement('canvas');
-      canvas.width = 2048;
-      canvas.height = 1024;
-      const ctx = canvas.getContext('2d');
+    function openMatchdayModal() {
+      document.getElementById('matchday-modal').classList.add('open');
+    }
 
-      if (zone.panoramaType === 'museum') {
-        // === MUSEU FC PORTO BY BMG INTERIOR ATMOSPHERE ===
-        // Premium museum lighting & deep blue walls
-        const wallGrad = ctx.createLinearGradient(0, 0, 0, 1024);
-        wallGrad.addColorStop(0, '#020617');
-        wallGrad.addColorStop(0.3, '#001438');
-        wallGrad.addColorStop(0.6, '#002B7F');
-        wallGrad.addColorStop(0.85, '#0B1528');
-        wallGrad.addColorStop(1, '#02040A');
-        ctx.fillStyle = wallGrad;
-        ctx.fillRect(0, 0, 2048, 1024);
+    function closeMatchdayModal() {
+      document.getElementById('matchday-modal').classList.remove('open');
+    }
 
-        // Ceiling spotlights
-        for (let x = 100; x < 2048; x += 220) {
-          const spotGrad = ctx.createRadialGradient(x, 100, 10, x, 500, 260);
-          spotGrad.addColorStop(0, 'rgba(255, 235, 150, 0.45)');
-          spotGrad.addColorStop(0.5, 'rgba(212, 175, 55, 0.15)');
-          spotGrad.addColorStop(1, 'rgba(0,0,0,0)');
-          ctx.fillStyle = spotGrad;
-          ctx.fillRect(x - 200, 0, 400, 700);
+    function switchMatchdayTab(tabId) {
+      document.querySelectorAll('.matchday-tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.matchday-pane').forEach(pane => pane.classList.remove('active'));
+
+      const activePane = document.getElementById(tabId);
+      if (activePane) activePane.classList.add('active');
+
+      const matchingBtn = Array.from(document.querySelectorAll('.matchday-tab-btn')).find(b => 
+        b.getAttribute('onclick') && b.getAttribute('onclick').includes(tabId)
+      );
+      if (matchingBtn) matchingBtn.classList.add('active');
+    }
+
+    function renderSectors(sectors) {
+      const container = document.getElementById('sectors-grid-container');
+      if (!container) return;
+
+      if (sectors.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; padding: 24px; text-align:center; color:#94A3B8; font-size:13px;">
+            Nenhum setor ou porta encontrado para a pesquisa. Experimenta procurar por "Porta 1", "Poente" ou "Sul".
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = sectors.map(s => `
+        <div class="sector-card">
+          <div class="sector-card-header">
+            <div class="sector-name">${s.name}</div>
+            <span class="gate-badge">${s.gates}</span>
+          </div>
+          <div class="sector-detail-row">
+            <span>🎟️</span>
+            <span><strong>Torniquetes:</strong> ${s.turnstiles}</span>
+          </div>
+          <div class="sector-detail-row" style="font-size:11px; color:#93C5FD;">
+            <span>♿</span>
+            <span>${s.accessibility}</span>
+          </div>
+          <div style="margin-top:4px; display:flex; flex-wrap:wrap; gap:4px;">
+            ${s.features.map(f => `<span style="font-size:9.5px; background:rgba(0,102,255,0.2); border:1px solid rgba(0,102,255,0.4); padding:2px 6px; border-radius:4px; color:#A0C4FF;">${f}</span>`).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    let activeSectorCategory = 'all';
+
+    function filterSectorCategory(category, btnElement) {
+      activeSectorCategory = category;
+      document.querySelectorAll('.sector-chip').forEach(c => c.classList.remove('active'));
+      if (btnElement) btnElement.classList.add('active');
+
+      applySectorFilters();
+    }
+
+    function filterSectorsList(query) {
+      applySectorFilters();
+    }
+
+    function applySectorFilters() {
+      const searchInput = document.getElementById('gate-search-input');
+      const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+      const filtered = REAL_DRAGAO_SECTORS.filter(s => {
+        const matchesCategory = (activeSectorCategory === 'all') || (s.category === activeSectorCategory);
+        const matchesQuery = !q || 
+          s.name.toLowerCase().includes(q) || 
+          s.gates.toLowerCase().includes(q) || 
+          s.turnstiles.toLowerCase().includes(q) ||
+          s.features.some(f => f.toLowerCase().includes(q));
+
+        return matchesCategory && matchesQuery;
+      });
+
+      renderSectors(filtered);
+    }
+
+    /* ==========================================================================
+       MATCHDAY COUNTDOWN TIMER
+       ========================================================================== */
+    function startMatchdayCountdown() {
+      // Next match target: Next Sunday at 20:30 (simulated real matchday schedule)
+      const now = new Date();
+      const targetDate = new Date();
+      targetDate.setDate(now.getDate() + ((7 - now.getDay() + 0) % 7 || 7));
+      targetDate.setHours(20, 30, 0, 0);
+
+      function updateClock() {
+        const current = new Date();
+        const diff = targetDate.getTime() - current.getTime();
+
+        if (diff <= 0) {
+          document.getElementById('cnt-days').textContent = '00';
+          document.getElementById('cnt-hours').textContent = '00';
+          document.getElementById('cnt-mins').textContent = '00';
+          document.getElementById('cnt-secs').textContent = '00';
+          return;
         }
 
-        // Museum Floor Tiles with reflections
-        ctx.fillStyle = '#0F172A';
-        ctx.fillRect(0, 560, 2048, 464);
-        ctx.strokeStyle = 'rgba(212, 175, 55, 0.3)';
-        ctx.lineWidth = 2;
-        for (let x = 0; x < 2048; x += 160) {
-          ctx.beginPath();
-          ctx.moveTo(x, 560);
-          ctx.lineTo(x + 80, 1024);
-          ctx.stroke();
-        }
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
 
-        // Trophy Showcases (Glass Vitrines)
-        ctx.fillStyle = 'rgba(212, 175, 55, 0.2)';
-        ctx.strokeStyle = '#D4AF37';
-        ctx.lineWidth = 3;
+        const dEl = document.getElementById('cnt-days');
+        const hEl = document.getElementById('cnt-hours');
+        const mEl = document.getElementById('cnt-mins');
+        const sEl = document.getElementById('cnt-secs');
 
-        // Big Championship Trophy Standings
-        const trophies = [
-          { name: "Taça dos Campeões 1987 (Viena)", x: 300 },
-          { name: "UEFA Champions League 2004 (Gelsenkirchen)", x: 650 },
-          { name: "Taça Intercontinental 1987 & 2004 (Tóquio)", x: 1024 },
-          { name: "Taça UEFA 2003 (Sevilha)", x: 1400 },
-          { name: "Liga Europa 2011 (Dublim)", x: 1750 }
-        ];
+        if (dEl) dEl.textContent = String(days).padStart(2, '0');
+        if (hEl) hEl.textContent = String(hours).padStart(2, '0');
+        if (mEl) mEl.textContent = String(mins).padStart(2, '0');
+        if (sEl) sEl.textContent = String(secs).padStart(2, '0');
+      }
 
-        trophies.forEach(t => {
-          // Vitrine base
-          ctx.fillStyle = '#1E293B';
-          ctx.fillRect(t.x - 110, 520, 220, 180);
-          ctx.strokeRect(t.x - 110, 520, 220, 180);
+      updateClock();
+      setInterval(updateClock, 1000);
+    }
 
-          // Glowing Trophy
-          ctx.fillStyle = '#FFE58F';
-          ctx.shadowColor = '#D4AF37';
-          ctx.shadowBlur = 25;
-          ctx.beginPath();
-          ctx.arc(t.x, 470, 38, 0, Math.PI * 2);
-          ctx.fill();
+    /* ==========================================================================
+       DRAGÃO TRIVIA QUIZ ENGINE
+       ========================================================================== */
+    function loadQuizQuestion() {
+      quizAnswered = false;
+      const q = DRAGAO_QUIZ_DATA[currentQuizIndex];
 
-          // Cup Handles
-          ctx.strokeStyle = '#D4AF37';
-          ctx.lineWidth = 6;
-          ctx.strokeRect(t.x - 46, 445, 92, 45);
-          ctx.shadowBlur = 0;
+      const numEl = document.getElementById('quiz-question-number');
+      const scoreEl = document.getElementById('quiz-score-display');
+      const titleEl = document.getElementById('quiz-question-title');
+      const optsContainer = document.getElementById('quiz-options-container');
+      const feedbackBox = document.getElementById('quiz-feedback-box');
+      const nextBtn = document.getElementById('btn-next-quiz-q');
 
-          // Label
-          ctx.fillStyle = '#FFFFFF';
-          ctx.font = 'bold 15px Montserrat, sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(t.name, t.x, 560);
-        });
+      if (!q || !optsContainer) return;
 
-        // Giant Museum Header Banner
-        ctx.fillStyle = '#D4AF37';
-        ctx.font = 'bold 44px Montserrat, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('🏛️ MUSEU FC PORTO BY BMG • SALA DOS TROFÉUS EUROPEUS', 1024, 300);
+      numEl.textContent = `Pergunta ${currentQuizIndex + 1} de ${DRAGAO_QUIZ_DATA.length}`;
+      scoreEl.textContent = `Pontos: ${quizScore} / ${DRAGAO_QUIZ_DATA.length}`;
+      titleEl.textContent = q.question;
+      feedbackBox.style.display = 'none';
+      nextBtn.style.display = 'none';
 
-        ctx.fillStyle = '#93C5FD';
-        ctx.font = '22px Montserrat, sans-serif';
-        ctx.fillText('130+ Anos de História • 7 Títulos Internacionais • Coleção Permanente', 1024, 350);
+      optsContainer.innerHTML = q.options.map((opt, i) => `
+        <button class="quiz-opt-btn" onclick="selectQuizOption(${i})">
+          <span style="font-weight:900; color:var(--fcp-gold);">${String.fromCharCode(65 + i)}.</span>
+          <span>${opt}</span>
+        </button>
+      `).join('');
+    }
 
+    function selectQuizOption(idx) {
+      if (quizAnswered) return;
+      quizAnswered = true;
+
+      const q = DRAGAO_QUIZ_DATA[currentQuizIndex];
+      const optButtons = document.querySelectorAll('.quiz-opt-btn');
+      const feedbackBox = document.getElementById('quiz-feedback-box');
+      const nextBtn = document.getElementById('btn-next-quiz-q');
+
+      if (idx === q.correct) {
+        quizScore++;
+        optButtons[idx].classList.add('correct');
+        feedbackBox.style.display = 'block';
+        feedbackBox.style.background = 'rgba(16, 185, 129, 0.2)';
+        feedbackBox.style.border = '1px solid #10B981';
+        feedbackBox.style.color = '#A7F3D0';
+        feedbackBox.innerHTML = `<strong>✅ Resposta Correta!</strong> ${q.explanation}`;
       } else {
-        // === REAL ESTÁDIO DO DRAGÃO 360° ARENA PANORAMA ===
-        // 1. Sky & Stadium Light Towers
-        const skyGrad = ctx.createLinearGradient(0, 0, 0, 480);
-        skyGrad.addColorStop(0, '#071633');
-        skyGrad.addColorStop(0.5, '#0E3370');
-        skyGrad.addColorStop(1, '#2563EB');
-        ctx.fillStyle = skyGrad;
-        ctx.fillRect(0, 0, 2048, 480);
-
-        // 2. Manuel Salgado's Iconic Translucent Curved Canopy Roof
-        ctx.fillStyle = 'rgba(240, 246, 255, 0.45)';
-        ctx.beginPath();
-        ctx.ellipse(1024, 180, 960, 130, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.lineWidth = 4;
-        ctx.stroke();
-
-        // White Steel Trusses (Pala do Dragão)
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-        ctx.lineWidth = 3;
-        for (let i = 80; i < 2048; i += 70) {
-          ctx.beginPath();
-          ctx.moveTo(i, 80);
-          ctx.lineTo(i + 30, 280);
-          ctx.stroke();
-        }
-
-        // 3. Floodlights (Holofotes de Alta Potência)
-        for (let f = 200; f < 2000; f += 400) {
-          const lightGlow = ctx.createRadialGradient(f, 120, 10, f, 120, 120);
-          lightGlow.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-          lightGlow.addColorStop(0.4, 'rgba(255, 255, 255, 0.4)');
-          lightGlow.addColorStop(1, 'rgba(255, 255, 255, 0)');
-          ctx.fillStyle = lightGlow;
-          ctx.fillRect(f - 120, 0, 240, 240);
-        }
-
-        // 4. Stadium Grandstands (50.033 Seats / Bancadas Azul e Branco)
-        // Top tier
-        ctx.fillStyle = '#002B7F';
-        ctx.fillRect(0, 280, 2048, 120);
-
-        // FC PORTO mosaic on stand
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = '900 68px Montserrat, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('FC PORTO', 512, 365);
-        ctx.fillText('ESTÁDIO DO DRAGÃO', 1536, 365);
-
-        // Stand rows texture (Simulating packed fans in Blue & White)
-        for (let y = 280; y < 510; y += 10) {
-          ctx.fillStyle = (y % 20 === 0) ? '#FFFFFF' : '#0038A8';
-          ctx.fillRect(0, y, 2048, 7);
-          // Crowd confetti dots
-          for (let x = 10; x < 2048; x += 25) {
-            if (Math.random() > 0.4) {
-              ctx.fillStyle = Math.random() > 0.5 ? '#93C5FD' : '#FFFFFF';
-              ctx.fillRect(x, y - 2, 4, 4);
-            }
-          }
-        }
-
-        // LED Pitch-side Banners
-        ctx.fillStyle = '#001438';
-        ctx.fillRect(0, 500, 2048, 30);
-        ctx.strokeStyle = '#D4AF37';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(0, 500, 2048, 30);
-
-        ctx.fillStyle = '#D4AF37';
-        ctx.font = 'bold 16px Montserrat, sans-serif';
-        ctx.textAlign = 'center';
-        for (let x = 200; x < 2048; x += 400) {
-          ctx.fillText('🐉 SOMOS PORTO • 1893 • SUPER BOCK • BMG', x, 521);
-        }
-
-        // 5. Emerald Green Natural Grass Pitch (Relvado Natural)
-        const pitchGrad = ctx.createLinearGradient(0, 530, 0, 1024);
-        pitchGrad.addColorStop(0, '#15803D');
-        pitchGrad.addColorStop(0.3, '#166534');
-        pitchGrad.addColorStop(0.7, '#14532D');
-        pitchGrad.addColorStop(1, '#052E16');
-        ctx.fillStyle = pitchGrad;
-        ctx.fillRect(0, 530, 2048, 494);
-
-        // Pitch Striping (Lawn Mower Bands)
-        for (let x = 0; x < 2048; x += 100) {
-          if ((x / 100) % 2 === 0) {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
-            ctx.fillRect(x, 530, 100, 494);
-          }
-        }
-
-        // White Pitch Lines (Center Circle, Touchlines, Penalty Box)
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.lineWidth = 5;
-
-        // Center line
-        ctx.beginPath();
-        ctx.moveTo(1024, 530);
-        ctx.lineTo(1024, 1024);
-        ctx.stroke();
-
-        // Center Circle
-        ctx.beginPath();
-        ctx.ellipse(1024, 750, 240, 110, 0, 0, Math.PI * 2);
-        ctx.stroke();
-
-        // Center Spot
-        ctx.fillStyle = '#FFFFFF';
-        ctx.beginPath();
-        ctx.arc(1024, 750, 10, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Goal Nets on Left & Right
-        [240, 1808].forEach(gx => {
-          ctx.strokeStyle = '#FFFFFF';
-          ctx.lineWidth = 4;
-          ctx.strokeRect(gx - 70, 540, 140, 80);
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-          ctx.fillRect(gx - 70, 540, 140, 80);
-        });
-
-        // 6. Current Zone Title Billboard in 3D Arena
-        ctx.fillStyle = 'rgba(0, 20, 56, 0.85)';
-        ctx.fillRect(724, 400, 600, 70);
-        ctx.strokeStyle = '#D4AF37';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(724, 400, 600, 70);
-
-        ctx.fillStyle = '#FFE58F';
-        ctx.font = 'bold 22px Montserrat, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(zone.name.toUpperCase(), 1024, 442);
+        optButtons[idx].classList.add('wrong');
+        optButtons[q.correct].classList.add('correct');
+        feedbackBox.style.display = 'block';
+        feedbackBox.style.background = 'rgba(239, 68, 68, 0.2)';
+        feedbackBox.style.border = '1px solid #EF4444';
+        feedbackBox.style.color = '#FCA5A5';
+        feedbackBox.innerHTML = `<strong>❌ Resposta Incorreta.</strong> ${q.explanation}`;
       }
 
-      return new THREE.CanvasTexture(canvas);
-    }
+      document.getElementById('quiz-score-display').textContent = `Pontos: ${quizScore} / ${DRAGAO_QUIZ_DATA.length}`;
 
-    const _zee = typeof THREE !== 'undefined' ? new THREE.Vector3(0, 0, 1) : null;
-    const _euler = typeof THREE !== 'undefined' ? new THREE.Euler() : null;
-    const _q0 = typeof THREE !== 'undefined' ? new THREE.Quaternion() : null;
-    const _q1 = typeof THREE !== 'undefined' ? new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)) : null;
-
-    function initThreeVR() {
-      if (typeof THREE === 'undefined') return;
-
-      const leftCanvas = document.getElementById('vr-canvas-left');
-      const rightCanvas = document.getElementById('vr-canvas-right');
-      const leftEyeHalf = document.getElementById('vr-left-eye');
-      const rightEyeHalf = document.getElementById('vr-right-eye');
-
-      const wLeft = leftEyeHalf.clientWidth || (window.innerWidth / (isStereoSplit ? 2 : 1));
-      const hLeft = leftEyeHalf.clientHeight || window.innerHeight;
-
-      // Left Eye Three.js Setup
-      if (!rendererLeft) {
-        sceneLeft = new THREE.Scene();
-        cameraLeft = new THREE.PerspectiveCamera(cameraFov, wLeft / hLeft, 0.1, 1500);
-        cameraLeft.position.set(0, 0, 0);
-
-        rendererLeft = new THREE.WebGLRenderer({ canvas: leftCanvas, antialias: true, alpha: false, powerPreference: "high-performance" });
-        rendererLeft.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        rendererLeft.setSize(wLeft, hLeft);
-
-        const geometry = new THREE.SphereGeometry(600, 64, 48);
-        geometry.scale(-1, 1, 1);
-
-        const texture = createProceduralPhotosphere(currentZone);
-        const material = new THREE.MeshBasicMaterial({ map: texture });
-        meshLeft = new THREE.Mesh(geometry, material);
-        sceneLeft.add(meshLeft);
+      if (currentQuizIndex < DRAGAO_QUIZ_DATA.length - 1) {
+        nextBtn.style.display = 'inline-flex';
+        nextBtn.textContent = 'Próxima Pergunta ▶';
       } else {
-        rendererLeft.setSize(wLeft, hLeft);
-        cameraLeft.fov = cameraFov;
-        cameraLeft.aspect = wLeft / hLeft;
-        cameraLeft.updateProjectionMatrix();
+        nextBtn.style.display = 'inline-flex';
+        nextBtn.textContent = 'Ver Resultado Final 🏆';
       }
+    }
 
-      // Right Eye Three.js Setup
-      const wRight = rightEyeHalf.clientWidth || (window.innerWidth / 2);
-      const hRight = rightEyeHalf.clientHeight || window.innerHeight;
-
-      if (!rendererRight) {
-        sceneRight = new THREE.Scene();
-        cameraRight = new THREE.PerspectiveCamera(cameraFov, wRight / hRight, 0.1, 1500);
-        cameraRight.position.set(0, 0, 0);
-
-        rendererRight = new THREE.WebGLRenderer({ canvas: rightCanvas, antialias: true, alpha: false, powerPreference: "high-performance" });
-        rendererRight.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        rendererRight.setSize(wRight, hRight);
-
-        const geometryRight = new THREE.SphereGeometry(600, 64, 48);
-        geometryRight.scale(-1, 1, 1);
-
-        const textureRight = createProceduralPhotosphere(currentZone);
-        const materialRight = new THREE.MeshBasicMaterial({ map: textureRight });
-        meshRight = new THREE.Mesh(geometryRight, materialRight);
-        sceneRight.add(meshRight);
+    function nextQuizQuestion() {
+      if (currentQuizIndex < DRAGAO_QUIZ_DATA.length - 1) {
+        currentQuizIndex++;
+        loadQuizQuestion();
       } else {
-        rendererRight.setSize(wRight, hRight);
-        cameraRight.fov = cameraFov;
-        cameraRight.aspect = wRight / hRight;
-        cameraRight.updateProjectionMatrix();
-      }
-
-      // Start render loop if not running
-      if (!animFrameId) {
-        animateVR();
-      }
-    }
-
-    function handleVRResize() {
-      if (!isVRActive || typeof THREE === 'undefined') return;
-      const leftEyeHalf = document.getElementById('vr-left-eye');
-      const rightEyeHalf = document.getElementById('vr-right-eye');
-
-      const wLeft = leftEyeHalf.clientWidth || (window.innerWidth / (isStereoSplit ? 2 : 1));
-      const hLeft = leftEyeHalf.clientHeight || window.innerHeight;
-
-      if (rendererLeft && cameraLeft) {
-        rendererLeft.setSize(wLeft, hLeft);
-        cameraLeft.aspect = wLeft / hLeft;
-        cameraLeft.updateProjectionMatrix();
-      }
-
-      if (isStereoSplit && rendererRight && cameraRight) {
-        const wRight = rightEyeHalf.clientWidth || (window.innerWidth / 2);
-        const hRight = rightEyeHalf.clientHeight || window.innerHeight;
-        rendererRight.setSize(wRight, hRight);
-        cameraRight.aspect = wRight / hRight;
-        cameraRight.updateProjectionMatrix();
-      }
-    }
-
-    function updateVRPhotosphereTexture(zone) {
-      if (!meshLeft || !meshRight || typeof THREE === 'undefined') return;
-      const texture = createProceduralPhotosphere(zone);
-      meshLeft.material.map = texture;
-      meshLeft.material.needsUpdate = true;
-      meshRight.material.map = texture;
-      meshRight.material.needsUpdate = true;
-    }
-
-    function applyVRCameraOrientation(camera) {
-      if (typeof THREE === 'undefined' || !camera) return;
-
-      if (hasRealGyroSignal && gyroActive) {
-        // Gyroscope tracking on mobile
-        const alphaRad = THREE.MathUtils.degToRad((gyroAlpha - baseZeroAlpha) + lon);
-        const betaRad = THREE.MathUtils.degToRad(gyroBeta);
-        const gammaRad = THREE.MathUtils.degToRad(-gyroGamma);
-        const orientRad = THREE.MathUtils.degToRad(screenOrientationAngle);
-
-        _euler.set(betaRad, alphaRad, gammaRad, 'YXZ');
-        camera.quaternion.setFromEuler(_euler);
-        camera.quaternion.multiply(_q1);
-        camera.quaternion.multiply(_q0.setFromAxisAngle(_zee, -orientRad));
-
-        // Pitch adjustment from touch drag if user dragged vertically
-        if (Math.abs(lat) > 0.1) {
-          const pitchOffset = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(-lat));
-          camera.quaternion.multiply(pitchOffset);
+        // Show Final Score Summary
+        const card = document.querySelector('.quiz-card');
+        if (card) {
+          card.innerHTML = `
+            <div style="text-align:center; padding:20px; display:flex; flex-direction:column; align-items:center; gap:14px;">
+              <div style="font-size:48px;">🏆</div>
+              <div style="font-family:'Montserrat',sans-serif; font-size:18px; font-weight:900; color:#FFF;">
+                Quiz Concluído! Pontuação: ${quizScore} / ${DRAGAO_QUIZ_DATA.length}
+              </div>
+              <div style="font-size:13px; color:#A0C4FF; max-width:400px; line-height:1.45;">
+                ${quizScore >= 4 ? '🐉 <strong>Dragão de Ouro!</strong> Conheces a fundo a história épica e o estádio do FC Porto!' : '⚽ <strong>Bom esforço, Portista!</strong> Continua a explorar o Museu e o Estádio para dominares a história azul e branca.'}
+              </div>
+              <button class="btn-action" style="background:#002B7F; border:1px solid var(--fcp-gold); color:#FFF; margin-top:8px;" onclick="restartQuiz()">
+                🔄 Repetir Quiz
+              </button>
+            </div>
+          `;
         }
-      } else {
-        // Drag / mouse / keyboard navigation for desktop and non-sensor browsers
-        const clampedLat = Math.max(-85, Math.min(85, lat));
-        const phi = THREE.MathUtils.degToRad(90 - clampedLat);
-        const theta = THREE.MathUtils.degToRad(lon);
-
-        const targetX = 600 * Math.sin(phi) * Math.cos(theta);
-        const targetY = 600 * Math.cos(phi);
-        const targetZ = 600 * Math.sin(phi) * Math.sin(theta);
-
-        camera.lookAt(targetX, targetY, targetZ);
       }
     }
 
-    function animateVR() {
-      animFrameId = requestAnimationFrame(animateVR);
-      if (!isVRActive) return;
-
-      if (cameraLeft) applyVRCameraOrientation(cameraLeft);
-      if (isStereoSplit && cameraRight) applyVRCameraOrientation(cameraRight);
-
-      // Render viewports
-      if (rendererLeft && sceneLeft && cameraLeft) {
-        rendererLeft.render(sceneLeft, cameraLeft);
-      }
-      if (isStereoSplit && rendererRight && sceneRight && cameraRight) {
-        rendererRight.render(sceneRight, cameraRight);
+    function restartQuiz() {
+      currentQuizIndex = 0;
+      quizScore = 0;
+      const tabQuiz = document.getElementById('tab-quiz');
+      if (tabQuiz) {
+        tabQuiz.innerHTML = `
+          <div class="quiz-card">
+            <div class="quiz-header">
+              <span style="font-family:'Montserrat',sans-serif; font-size:13px; font-weight:900; color:var(--fcp-gold-light);" id="quiz-question-number">Pergunta 1 de 5</span>
+              <span style="font-size:11.5px; font-weight:700; color:#93C5FD;" id="quiz-score-display">Pontos: 0</span>
+            </div>
+            <div class="quiz-question-text" id="quiz-question-title"></div>
+            <div class="quiz-options-list" id="quiz-options-container"></div>
+            <div class="quiz-feedback-box" id="quiz-feedback-box"></div>
+            <button class="btn-action" id="btn-next-quiz-q" style="display:none; align-self:flex-end; background:#002B7F; border:1px solid var(--fcp-gold); color:#FFF;" onclick="nextQuizQuestion()">
+              Próxima Pergunta ▶
+            </button>
+          </div>
+        `;
+        loadQuizQuestion();
       }
     }
 
@@ -2506,18 +2833,12 @@
         isAudioPlaying = true;
         document.getElementById('btn-toggle-stadium-audio').classList.add('playing');
         document.getElementById('audio-btn-label').textContent = 'Som: A Tocar 🔊';
-        document.getElementById('btn-vr-audio-toggle').textContent = '🔊 Som: ON';
       } else {
         stopContinuousAmbience();
         isAudioPlaying = false;
         document.getElementById('btn-toggle-stadium-audio').classList.remove('playing');
         document.getElementById('audio-btn-label').textContent = 'Som do Dragão';
-        document.getElementById('btn-vr-audio-toggle').textContent = '🔇 Som: OFF';
       }
-    }
-
-    function toggleStadiumAudioInVR() {
-      toggleStadiumAudio();
     }
 
     function startContinuousAmbience() {
@@ -2580,7 +2901,6 @@
 
       if (type === 'chant' || type === 'classico') {
         // "FILHOS DO DRAGÃO / SOMOS PORTO" Clássico Chanting Roar
-        // Layer 1: Massive 50k crowd roaring noise surge
         const bufferSize = audioCtx.sampleRate * 4.5;
         const roarBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
         const data = roarBuffer.getChannelData(0);
@@ -2605,13 +2925,12 @@
         roarGain.connect(masterGain);
         roarSrc.start(now);
 
-        // Layer 2: Harmonic vocal melody chant ("PORTO, PORTO, PORTO!")
+        // Harmonic vocal melody chant ("PORTO, PORTO, PORTO!")
         const fcpMelody = [220, 261.6, 293.6, 329.6, 392.0, 440.0, 392.0, 329.6, 440.0];
         const rhythm = [0, 0.35, 0.7, 1.1, 1.6, 2.0, 2.4, 2.8, 3.4];
         
         fcpMelody.forEach((freq, idx) => {
           const t = now + rhythm[idx];
-          // Create 4 detuned oscillators to sound like a stadium crowd shouting together
           [-8, -3, 3, 8].forEach(detune => {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -2636,7 +2955,7 @@
           });
         });
 
-        // Layer 3: Synchronized heavy bass drum kicks
+        // Bass drum kicks
         [0, 0.7, 1.6, 2.4, 3.4].forEach(offset => {
           triggerDrumBeat(now + offset);
         });
@@ -2662,7 +2981,6 @@
           osc.stop(now + t + 0.5);
         });
       } else if (type === 'goal') {
-        // Massive Goal Roar in Clássico
         const bufferSize = audioCtx.sampleRate * 5;
         const roarBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
         const data = roarBuffer.getChannelData(0);
@@ -2688,7 +3006,6 @@
         roarGain.connect(masterGain);
         roarSrc.start(now);
 
-        // Clássico Shouts & Whistles
         for (let i = 0; i < 16; i++) {
           const osc = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
@@ -2739,7 +3056,6 @@
       if (!cachedVoices || cachedVoices.length === 0) {
         cachedVoices = window.speechSynthesis.getVoices();
       }
-      // Look for European Portuguese (pt-PT) first, then pt-BR, then any PT
       const ptPT = cachedVoices.find(v => v.lang === 'pt-PT' || v.lang === 'pt_PT');
       if (ptPT) return ptPT;
       const ptBR = cachedVoices.find(v => v.lang.startsWith('pt'));
@@ -2755,7 +3071,6 @@
       if (isNarratorEnabled) {
         btn.classList.add('narrating');
         label.textContent = 'Narrador: ON 🎙️';
-        // Read current zone immediately
         speakZoneDescription(currentZone);
       } else {
         btn.classList.remove('narrating');
@@ -2773,7 +3088,6 @@
     }
 
     function playZoneNarrationExplicit() {
-      // If currently speaking, clicking will stop or restart
       if (isSpeakingNarration) {
         stopNarration();
       } else {
@@ -2791,7 +3105,6 @@
         return;
       }
 
-      // Cancel previous speech if running
       window.speechSynthesis.cancel();
 
       const textToSpeak = zone.audioNarration || `${zone.name}. ${zone.description}`;
@@ -2799,7 +3112,7 @@
       const utterance = new SpeechSynthesisUtterance(textToSpeak);
       currentUtterance = utterance;
       utterance.lang = 'pt-PT';
-      utterance.rate = 1.02; // natural cadence
+      utterance.rate = 1.02;
       utterance.pitch = 1.0;
 
       const voice = getBestPortugueseVoice();
@@ -2818,12 +3131,10 @@
       };
 
       utterance.onerror = (e) => {
-        console.log("Speech utterance event:", e);
         isSpeakingNarration = false;
         updateNarratorUIState(false);
       };
 
-      // Resume speech synthesis if browser suspended it
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume();
       }
@@ -2835,196 +3146,16 @@
       const hudBtn = document.getElementById('btn-hud-read-zone');
       const hudText = document.getElementById('hud-narrate-btn-text');
       const headerBtn = document.getElementById('btn-toggle-narrator');
-      const vrNarrateBtn = document.getElementById('btn-vr-narrate');
 
       if (speaking) {
         if (hudBtn) hudBtn.classList.add('active-speaking');
         if (hudText) hudText.textContent = 'A Narrar... ⏹️';
         if (headerBtn) headerBtn.classList.add('narrating');
-        if (vrNarrateBtn) {
-          vrNarrateBtn.textContent = '⏹️ Parar Voz';
-          vrNarrateBtn.style.background = '#EC4899';
-        }
       } else {
         if (hudBtn) hudBtn.classList.remove('active-speaking');
         if (hudText) hudText.textContent = 'Ouvir História 🎙️';
         if (headerBtn && !isNarratorEnabled) headerBtn.classList.remove('narrating');
-        if (vrNarrateBtn) {
-          vrNarrateBtn.textContent = '🎙️ Narrar';
-          vrNarrateBtn.style.background = '';
-        }
       }
-    }
-
-    /* ==========================================================================
-       VR MODE LAUNCHERS (SBS, GYROSCOPE, WEBXR)
-       ========================================================================== */
-    function openVRModal() {
-      document.getElementById('vr-select-modal').classList.add('open');
-    }
-    function closeVRModal() {
-      document.getElementById('vr-select-modal').classList.remove('open');
-    }
-
-    function launchStereoVRMode(stereo = true) {
-      closeVRModal();
-      isVRActive = true;
-      isStereoSplit = stereo;
-      vrViewMode = '3d-gyro';
-
-      const container = document.getElementById('vr-stereo-container');
-      container.classList.add('active');
-
-      const leftCanvas = document.getElementById('vr-canvas-left');
-      const rightCanvas = document.getElementById('vr-canvas-right');
-      const leftIframe = document.getElementById('vr-iframe-left');
-      const rightIframe = document.getElementById('vr-iframe-right');
-      const rightEye = document.getElementById('vr-right-eye');
-      const divider = document.getElementById('vr-divider');
-      const splitBtn = document.getElementById('btn-vr-split-toggle');
-      const modeBtn = document.getElementById('btn-vr-mode-toggle');
-
-      leftCanvas.style.display = 'block';
-      rightCanvas.style.display = 'block';
-      leftIframe.style.display = 'none';
-      rightIframe.style.display = 'none';
-      if (modeBtn) modeBtn.textContent = '🔄 3D Gyro';
-
-      if (!stereo) {
-        rightEye.style.display = 'none';
-        divider.style.display = 'none';
-        if (splitBtn) splitBtn.textContent = '📱 1 Ecrã (Cheio)';
-      } else {
-        rightEye.style.display = 'flex';
-        divider.style.display = 'block';
-        if (splitBtn) splitBtn.textContent = '🥽 2 Ecrãs (SBS)';
-      }
-
-      document.getElementById('vr-hud-current-zone').textContent = currentZone.name;
-
-      // Initialize Three.js VR Engine
-      initThreeVR();
-      setTimeout(() => {
-        handleVRResize();
-        updateVRPhotosphereTexture(currentZone);
-      }, 50);
-
-      // Check Gyroscope Permission requirement for iOS / Android
-      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function' && !hasRealGyroSignal) {
-        document.getElementById('vr-permission-prompt').style.display = 'flex';
-      } else {
-        requestGyroPermissionExplicit();
-      }
-
-      // Request fullscreen for immersive smartphone VR / Cardboard
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      }
-    }
-
-    function toggleVRStereoSplit() {
-      isStereoSplit = !isStereoSplit;
-      const rightEye = document.getElementById('vr-right-eye');
-      const divider = document.getElementById('vr-divider');
-      const splitBtn = document.getElementById('btn-vr-split-toggle');
-
-      if (!isStereoSplit) {
-        rightEye.style.display = 'none';
-        divider.style.display = 'none';
-        if (splitBtn) splitBtn.textContent = '📱 1 Ecrã (Cheio)';
-      } else {
-        rightEye.style.display = 'flex';
-        divider.style.display = 'block';
-        if (splitBtn) splitBtn.textContent = '🥽 2 Ecrãs (SBS)';
-      }
-      setTimeout(handleVRResize, 30);
-    }
-
-    function launchGyroscopeMode() {
-      launchStereoVRMode(false);
-    }
-
-    let xrSession = null;
-
-    async function launchWebXRImmersive() {
-      closeVRModal();
-      if (navigator.xr && navigator.xr.isSessionSupported) {
-        try {
-          const supported = await navigator.xr.isSessionSupported('immersive-vr');
-          if (supported) {
-            xrSession = await navigator.xr.requestSession('immersive-vr', {
-              optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking']
-            });
-
-            // If WebXR immersive session is successfully created (e.g. inside Meta Quest browser)
-            xrSession.addEventListener('end', () => {
-              xrSession = null;
-              exitVRMode();
-            });
-
-            launchStereoVRMode(true);
-            return;
-          }
-        } catch (err) {
-          console.warn('WebXR native immersive session request handled:', err);
-        }
-      }
-      // Fallback seamlessly to stereoscopic 360 gyro mode
-      launchStereoVRMode(true);
-    }
-
-    function startAudioAndLaunchVR() {
-      if (!isAudioPlaying) {
-        toggleStadiumAudio();
-      }
-      launchStereoVRMode(true);
-    }
-
-    function toggleVRViewMode() {
-      const leftCanvas = document.getElementById('vr-canvas-left');
-      const rightCanvas = document.getElementById('vr-canvas-right');
-      const leftIframe = document.getElementById('vr-iframe-left');
-      const rightIframe = document.getElementById('vr-iframe-right');
-      const btn = document.getElementById('btn-vr-mode-toggle');
-
-      if (vrViewMode === '3d-gyro') {
-        vrViewMode = 'streetview';
-        leftCanvas.style.display = 'none';
-        rightCanvas.style.display = 'none';
-        leftIframe.style.display = 'block';
-        rightIframe.style.display = 'block';
-        leftIframe.src = currentZone.embedUrl;
-        rightIframe.src = currentZone.embedUrl;
-        if (btn) btn.textContent = '🌐 Street View';
-      } else {
-        vrViewMode = '3d-gyro';
-        leftIframe.style.display = 'none';
-        rightIframe.style.display = 'none';
-        leftCanvas.style.display = 'block';
-        rightCanvas.style.display = 'block';
-        updateVRPhotosphereTexture(currentZone);
-        if (btn) btn.textContent = '🔄 3D Gyro';
-      }
-    }
-
-    function exitVRMode() {
-      isVRActive = false;
-      document.getElementById('vr-stereo-container').classList.remove('active');
-      document.getElementById('vr-permission-prompt').style.display = 'none';
-
-      if (document.fullscreenElement && document.exitFullscreen) {
-        document.exitFullscreen().catch(() => {});
-      }
-    }
-
-    function nextVRZone() {
-      currentZoneIndex = (currentZoneIndex + 1) % REAL_DRAGAO_ZONES.length;
-      selectZone(REAL_DRAGAO_ZONES[currentZoneIndex].id);
-    }
-
-    function prevVRZone() {
-      currentZoneIndex = (currentZoneIndex - 1 + REAL_DRAGAO_ZONES.length) % REAL_DRAGAO_ZONES.length;
-      selectZone(REAL_DRAGAO_ZONES[currentZoneIndex].id);
     }
 
     /* ==========================================================================

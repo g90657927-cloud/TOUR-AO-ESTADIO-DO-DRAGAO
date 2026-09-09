@@ -1,0 +1,6 @@
+{
+  "name": "Visita Virtual 3D ao Estádio do Dragão",
+  "description": "Visita virtual interativa ao Estádio do Dragão do FC Porto com Google Street View oficial 360°, Modo VR Universal para todos os óculos de realidade virtual, Sons e Cânticos de Estádio em direto e Guia IA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

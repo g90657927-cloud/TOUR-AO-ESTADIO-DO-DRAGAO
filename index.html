@@ -1,0 +1,3135 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Visita Virtual Street View 360° & VR ao Estádio do Dragão | FC Porto</title>
+  <meta name="description" content="Explora o Estádio do Dragão e o Museu FC Porto em 360° com Google Street View oficial, Modo VR Universal com Giroscópio para todos os óculos VR, sons de estádio reais e Guia IA." />
+  <meta property="og:title" content="Visita Virtual Street View 360° & VR ao Estádio do Dragão" />
+  <meta property="og:description" content="Visita interativa com Google Street View às zonas reais do Estádio do Dragão, Museu FC Porto, Modo VR com Giroscópio e sons reais de estádio." />
+
+  <!-- Google Fonts: Montserrat & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Three.js for 3D Photosphere & VR Gyroscope Engine -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    :root {
+      --fcp-blue: #002B7F;
+      --fcp-dark-blue: #001438;
+      --fcp-deep: #050B17;
+      --fcp-light-blue: #0066FF;
+      --fcp-accent-blue: #00A3FF;
+      --fcp-gold: #D4AF37;
+      --fcp-gold-light: #F3E5AB;
+      --fcp-white: #FFFFFF;
+      --fcp-gray-100: #F1F5F9;
+      --fcp-gray-400: #94A3B8;
+      --fcp-gray-800: #1E293B;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--fcp-deep);
+      color: #FFFFFF;
+      user-select: none;
+    }
+
+    /* App Container Layout */
+    .app-root {
+      display: flex;
+      flex-direction: column;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ⚠️ Fan Disclaimer Banner */
+    .disclaimer-banner {
+      width: 100%;
+      background: linear-gradient(90deg, #991B1B 0%, #DC2626 50%, #991B1B 100%);
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+      padding: 6px 12px;
+      letter-spacing: 0.3px;
+      z-index: 50;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    /* Top Navigation Header */
+    .top-header {
+      background: linear-gradient(180deg, rgba(0, 20, 56, 0.98) 0%, rgba(0, 15, 40, 0.95) 100%);
+      border-bottom: 1.5px solid rgba(212, 175, 55, 0.4);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 40;
+      backdrop-filter: blur(12px);
+      flex-shrink: 0;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .brand-logo-svg {
+      width: 36px;
+      height: 36px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+      transition: transform 0.2s ease;
+    }
+
+    .brand-group:hover .brand-logo-svg {
+      transform: scale(1.05);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing: 0.8px;
+      color: #FFFFFF;
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-badge {
+      background: #34A853;
+      color: #FFFFFF;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 5px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .brand-subtitle {
+      font-size: 10.5px;
+      color: var(--fcp-gold);
+      font-weight: 600;
+      letter-spacing: 0.4px;
+    }
+
+    /* Header Action Buttons */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #FFFFFF;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-action:hover {
+      background: rgba(0, 102, 255, 0.25);
+      border-color: var(--fcp-light-blue);
+      transform: translateY(-1px);
+    }
+
+    .btn-action.vr-btn {
+      background: linear-gradient(135deg, #FF0055 0%, #B8003C 100%);
+      border: 1px solid #FF5588;
+      box-shadow: 0 0 14px rgba(255, 0, 85, 0.4);
+      font-weight: 800;
+      animation: pulse-vr 2.5s infinite;
+    }
+    @keyframes pulse-vr {
+      0%, 100% { box-shadow: 0 0 10px rgba(255, 0, 85, 0.4); }
+      50% { box-shadow: 0 0 18px rgba(255, 0, 85, 0.8); }
+    }
+    .btn-action.vr-btn:hover {
+      background: linear-gradient(135deg, #FF1A6B 0%, #D40049 100%);
+    }
+
+    .btn-action.museum-quick-btn {
+      background: linear-gradient(135deg, #D4AF37 0%, #997A15 100%);
+      border: 1px solid #FFE58F;
+      color: #001438;
+      font-weight: 800;
+    }
+    .btn-action.museum-quick-btn:hover {
+      background: linear-gradient(135deg, #F3E5AB 0%, #D4AF37 100%);
+      transform: translateY(-1px);
+    }
+
+    .btn-action.audio-btn {
+      background: rgba(0, 163, 255, 0.15);
+      border: 1px solid rgba(0, 163, 255, 0.4);
+      color: #70C5FF;
+    }
+    .btn-action.audio-btn.playing {
+      background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+      border-color: #38BDF8;
+      color: #FFFFFF;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    }
+
+    .btn-action.narrator-btn {
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.45);
+      color: #D8B4FE;
+      font-weight: 700;
+    }
+    .btn-action.narrator-btn:hover {
+      background: linear-gradient(135deg, #9333EA 0%, #7E22CE 100%);
+      color: #FFFFFF;
+      border-color: #C084FC;
+      transform: translateY(-1px);
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
+    }
+    .btn-action.narrator-btn.narrating {
+      background: linear-gradient(135deg, #A855F7 0%, #7E22CE 100%);
+      border-color: #E9D5FF;
+      color: #FFFFFF;
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.7);
+      animation: pulse-narrator 2s infinite;
+    }
+    @keyframes pulse-narrator {
+      0%, 100% { box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
+      50% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.9); }
+    }
+
+    .btn-hud.narrator-hud-btn {
+      background: linear-gradient(135deg, #9333EA 0%, #6B21A8 100%);
+      border-color: #C084FC;
+      color: #FFFFFF;
+    }
+    .btn-hud.narrator-hud-btn:hover {
+      background: linear-gradient(135deg, #A855F7 0%, #7E22CE 100%);
+    }
+    .btn-hud.narrator-hud-btn.active-speaking {
+      background: linear-gradient(135deg, #EC4899 0%, #BE185D 100%);
+      border-color: #F472B6;
+      box-shadow: 0 0 12px rgba(236, 72, 153, 0.6);
+    }
+
+    .btn-action.ai-btn {
+      background: linear-gradient(135deg, #6366F1 0%, #4338CA 100%);
+      border: 1px solid #818CF8;
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.35);
+    }
+    .btn-action.ai-btn:hover {
+      background: linear-gradient(135deg, #4F46E5 0%, #3730A3 100%);
+    }
+
+    .btn-action.auth-btn {
+      background: linear-gradient(135deg, #002B7F 0%, #0044B2 100%);
+      border: 1px solid var(--fcp-gold);
+      color: #FFFFFF;
+    }
+
+    /* Sound Equalizer Waves Animation */
+    .sound-waves {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      height: 12px;
+    }
+    .sound-bar {
+      width: 2.5px;
+      height: 4px;
+      background: #38BDF8;
+      border-radius: 1px;
+    }
+    .playing .sound-bar:nth-child(1) { animation: wave 0.8s ease infinite 0.1s; }
+    .playing .sound-bar:nth-child(2) { animation: wave 0.8s ease infinite 0.3s; }
+    .playing .sound-bar:nth-child(3) { animation: wave 0.8s ease infinite 0.2s; }
+    .playing .sound-bar:nth-child(4) { animation: wave 0.8s ease infinite 0.4s; }
+    @keyframes wave {
+      0%, 100% { height: 3px; }
+      50% { height: 12px; }
+    }
+
+    /* Main Workspace Layout */
+    .main-workspace {
+      display: flex;
+      flex: 1;
+      height: calc(100% - 85px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Sidebar - Real Zones Directory */
+    .zones-sidebar {
+      width: 320px;
+      background: rgba(0, 16, 42, 0.96);
+      border-right: 1.5px solid rgba(212, 175, 55, 0.3);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 30;
+      backdrop-filter: blur(16px);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sidebar-header {
+      padding: 12px 14px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--fcp-gold);
+      letter-spacing: 0.6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .zones-count-badge {
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      color: var(--fcp-gold-light);
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 12px;
+    }
+
+    .sidebar-scroll-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .sidebar-scroll-list::-webkit-scrollbar {
+      width: 5px;
+    }
+    .sidebar-scroll-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+
+    /* Zone Item Card */
+    .zone-card {
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      position: relative;
+    }
+
+    .zone-card:hover {
+      background: rgba(0, 102, 255, 0.18);
+      border-color: rgba(0, 163, 255, 0.4);
+      transform: translateX(3px);
+    }
+
+    .zone-card.active {
+      background: linear-gradient(90deg, rgba(0, 43, 127, 0.85) 0%, rgba(0, 102, 255, 0.35) 100%);
+      border: 1.5px solid var(--fcp-gold);
+      box-shadow: 0 4px 14px rgba(0, 43, 127, 0.4);
+    }
+
+    .zone-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .zone-card-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      color: #FFFFFF;
+      line-height: 1.3;
+    }
+
+    .zone-card-category {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: #70C5FF;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .zone-card-coords {
+      font-size: 9px;
+      color: rgba(255, 255, 255, 0.5);
+      font-family: monospace;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .zone-card.active .zone-card-name {
+      color: #FFE58F;
+    }
+
+    /* Main Street View Stage */
+    .streetview-stage {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #000000;
+    }
+
+    .streetview-iframe-wrapper {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .streetview-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* Sound Chants Bar Overlay */
+    .stadium-chants-tray {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(0, 14, 36, 0.92);
+      border: 1.5px solid var(--fcp-gold);
+      border-radius: 12px;
+      padding: 7px 12px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      z-index: 25;
+    }
+
+    .chant-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #FFFFFF;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .chant-btn:hover {
+      background: #002B7F;
+      border-color: var(--fcp-gold);
+      color: #FFF;
+      transform: translateY(-1px);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+    }
+    .chant-btn:active {
+      transform: scale(0.96);
+    }
+    .chant-btn.active-chant {
+      background: linear-gradient(135deg, #FF0055 0%, #B8003C 100%);
+      border-color: #FF88AA;
+      color: #FFF;
+    }
+
+    /* Floating Info Overlay Bar */
+    .stage-bottom-hud {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      right: 14px;
+      background: rgba(0, 14, 36, 0.92);
+      border: 1.5px solid rgba(212, 175, 55, 0.4);
+      border-radius: 12px;
+      padding: 10px 16px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      z-index: 20;
+      transition: all 0.3s ease;
+    }
+
+    .hud-info-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      max-width: 60%;
+    }
+
+    .hud-zone-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hud-tag-pill {
+      background: #002B7F;
+      border: 1px solid var(--fcp-gold);
+      color: var(--fcp-gold-light);
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 5px;
+      text-transform: uppercase;
+    }
+
+    .hud-zone-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: 0.3px;
+    }
+
+    .hud-zone-desc {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.35;
+    }
+
+    .hud-actions-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-hud {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #FFFFFF;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-hud:hover {
+      background: rgba(0, 102, 255, 0.3);
+      border-color: var(--fcp-light-blue);
+      transform: translateY(-1px);
+    }
+
+    .btn-hud.vr-hud-btn {
+      background: linear-gradient(135deg, #FF0055 0%, #B8003C 100%);
+      border-color: #FF5588;
+      box-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
+    }
+
+    .btn-hud.primary-maps {
+      background: #1A73E8;
+      border-color: #4285F4;
+      color: #FFFFFF;
+    }
+    .btn-hud.primary-maps:hover {
+      background: #1557B0;
+    }
+
+    /* Floating Quick Zone Carousel (Mobile) */
+    .floating-toggle-sidebar {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(0, 20, 56, 0.9);
+      border: 1px solid var(--fcp-gold);
+      color: #FFFFFF;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      z-index: 25;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ==========================================================================
+       FULLSCREEN UNIVERSAL VR & 3D GYROSCOPE ENGINE (CARDBOARD, QUEST, MOBILE)
+       ========================================================================== */
+    .vr-fullscreen-container {
+      position: fixed;
+      inset: 0;
+      background: #000000;
+      z-index: 999999;
+      display: none;
+      flex-direction: row;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+    }
+
+    .vr-fullscreen-container.active {
+      display: flex;
+    }
+
+    /* Stereoscopic Dual Viewport Mode */
+    .vr-viewport-sbs {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .vr-eye-half {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      background: #000000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* WebGL 3D Canvas Canvas */
+    .vr-webgl-canvas {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+      display: block;
+    }
+
+    .vr-eye-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      pointer-events: auto;
+      display: none;
+    }
+
+    /* Central VR Divider line for Cardboard / Mobile VR headsets */
+    .vr-center-divider {
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, #000 0%, #444 50%, #000 100%);
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .vr-center-divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      border: 2px solid #D4AF37;
+    }
+
+    /* In-VR Floating HUD Overlay (Gaze & Remote controls) */
+    .vr-inheadset-hud {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 10, 30, 0.92);
+      border: 1.5px solid var(--fcp-gold);
+      border-radius: 20px;
+      padding: 6px 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      z-index: 9999999;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.9);
+      pointer-events: auto;
+      max-width: 96vw;
+    }
+
+    .vr-hud-item {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      color: #FFE58F;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      padding: 2px 6px;
+    }
+
+    .vr-gyro-telemetry-badge {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid #10B981;
+      color: #A7F3D0;
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .vr-gyro-telemetry-badge.inactive {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #3B82F6;
+      color: #93C5FD;
+    }
+
+    .vr-btn-control {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #FFFFFF;
+      padding: 6px 10px;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      touch-action: manipulation;
+    }
+
+    .vr-btn-control:hover, .vr-btn-control:focus {
+      background: #FF0055;
+      border-color: #FF88AA;
+      transform: scale(1.04);
+    }
+
+    .vr-btn-exit {
+      background: rgba(239, 68, 68, 0.85);
+      border-color: #EF4444;
+    }
+    .vr-btn-exit:hover {
+      background: #DC2626;
+    }
+
+    /* VR Gyro Permission Banner on screen in VR */
+    .vr-permission-cta {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 20, 56, 0.95);
+      border: 2px solid var(--fcp-gold);
+      border-radius: 14px;
+      padding: 10px 18px;
+      z-index: 9999999;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    }
+
+    .vr-permission-cta button {
+      background: #10B981;
+      border: none;
+      color: #000;
+      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    /* VR Gaze Reticle Center Pointer */
+    .vr-reticle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      z-index: 120;
+      pointer-events: none;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+    }
+    .vr-reticle::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 4px;
+      height: 4px;
+      background: #FF0055;
+      border-radius: 50%;
+    }
+
+    /* Modals & Dialogs */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 8, 24, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-dialog {
+      background: #0B132B;
+      border: 1.5px solid var(--fcp-gold);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 580px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      max-height: 85vh;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #FFF;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease;
+      z-index: 10;
+    }
+
+    .modal-close-btn:hover {
+      background: rgba(239, 68, 68, 0.6);
+    }
+
+    /* VR Launch Modal Styles */
+    .vr-modal-body {
+      padding: 24px 22px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .vr-modes-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    .vr-mode-option {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 16px 12px;
+      cursor: pointer;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .vr-mode-option:hover {
+      background: rgba(255, 0, 85, 0.15);
+      border-color: #FF0055;
+      transform: translateY(-2px);
+    }
+
+    .vr-option-icon {
+      font-size: 28px;
+    }
+
+    .vr-option-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: #FFF;
+    }
+
+    .vr-option-desc {
+      font-size: 10.5px;
+      color: #A0C4FF;
+      line-height: 1.35;
+    }
+
+    /* Google Auth & Digital Fan Card */
+    .auth-modal-body {
+      padding: 28px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .auth-logo {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 2px;
+    }
+
+    .auth-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 17px;
+      font-weight: 900;
+      color: #FFF;
+    }
+
+    .auth-subtitle {
+      font-size: 12px;
+      color: #A0C4FF;
+      line-height: 1.45;
+      max-width: 440px;
+    }
+
+    .btn-google-sign {
+      background: #FFFFFF;
+      color: #1F2937;
+      border: none;
+      padding: 11px 22px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      width: 100%;
+      max-width: 360px;
+      justify-content: center;
+    }
+
+    .btn-google-sign:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
+    }
+
+    /* Fan Digital Card */
+    .fan-card {
+      width: 100%;
+      max-width: 400px;
+      background: linear-gradient(135deg, #001F5C 0%, #001438 50%, #002B7F 100%);
+      border: 2px solid var(--fcp-gold);
+      border-radius: 14px;
+      padding: 16px 18px;
+      text-align: left;
+      position: relative;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .fan-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+      padding-bottom: 8px;
+    }
+
+    .fan-card-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 15px;
+      font-weight: 900;
+      color: #FFF;
+      text-transform: uppercase;
+    }
+
+    .fan-card-email {
+      font-size: 11.5px;
+      color: #93C5FD;
+      margin-bottom: 3px;
+    }
+
+    .fan-card-id {
+      font-size: 10.5px;
+      font-family: monospace;
+      color: var(--fcp-gold);
+      font-weight: 700;
+    }
+
+    /* Gemini AI Guide Chat Modal */
+    .ai-modal-header {
+      padding: 14px 18px;
+      background: linear-gradient(90deg, #1E1B4B 0%, #312E81 100%);
+      border-bottom: 1.5px solid #818CF8;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .ai-chat-box {
+      flex: 1;
+      height: 360px;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #070B16;
+    }
+
+    .ai-chat-box::-webkit-scrollbar {
+      width: 5px;
+    }
+    .ai-chat-box::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+
+    .ai-msg {
+      max-width: 85%;
+      padding: 11px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .ai-msg.user {
+      align-self: flex-end;
+      background: #0044B2;
+      color: #FFF;
+      border-bottom-right-radius: 2px;
+    }
+
+    .ai-msg.assistant {
+      align-self: flex-start;
+      background: rgba(30, 41, 59, 0.9);
+      color: #E2E8F0;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-bottom-left-radius: 2px;
+    }
+
+    .ai-quick-pills {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 8px 12px;
+      background: #040812;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+
+    .ai-pill {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #CBD5E1;
+      font-size: 10.5px;
+      padding: 4px 9px;
+      border-radius: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .ai-pill:hover {
+      background: rgba(99, 102, 241, 0.35);
+      border-color: #818CF8;
+      color: #FFF;
+    }
+
+    .ai-input-bar {
+      padding: 10px 14px;
+      background: #0B1120;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      gap: 8px;
+    }
+
+    .ai-input-bar input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #FFF;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .ai-input-bar input:focus {
+      border-color: #818CF8;
+    }
+
+    .ai-input-bar button {
+      background: #4F46E5;
+      border: none;
+      color: #FFF;
+      padding: 0 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Responsive Queries */
+    @media (max-width: 900px) {
+      .zones-sidebar {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        transform: translateX(-100%);
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8);
+      }
+      .zones-sidebar.open {
+        transform: translateX(0);
+      }
+      .floating-toggle-sidebar {
+        display: flex;
+      }
+      .hud-info-left {
+        max-width: 100%;
+      }
+      .stage-bottom-hud {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .hud-actions-right {
+        width: 100%;
+        justify-content: flex-end;
+      }
+      .stadium-chants-tray {
+        display: none;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .brand-subtitle {
+        display: none;
+      }
+      .btn-action span {
+        display: none;
+      }
+      .btn-action {
+        padding: 6px 9px;
+      }
+      .vr-modes-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-root">
+    <!-- Mandatory Non-Affiliation Disclaimer Banner -->
+    <div class="disclaimer-banner">
+      <span>⚠️ Aviso: Não somos afiliados do FC Porto, somos apenas adeptos! Visita virtual com Google Street View oficial, Museu FC Porto, Modo VR com Giroscópio 360° e Sons de Estádio.</span>
+    </div>
+
+    <!-- Top Navigation Header -->
+    <header class="top-header">
+      <div class="brand-group" id="btn-brand-home" title="Estádio do Dragão - Street View & VR">
+        <svg class="brand-logo-svg" viewBox="0 0 100 100">
+          <path d="M 50 5 L 85 20 L 85 60 C 85 80 50 95 50 95 C 50 95 15 80 15 60 L 15 20 Z" fill="#002B7F" stroke="#D4AF37" stroke-width="3"/>
+          <path d="M 38 20 L 38 80 M 62 20 L 62 80" stroke="#FFFFFF" stroke-width="8"/>
+          <circle cx="50" cy="48" r="18" fill="#001438" stroke="#D4AF37" stroke-width="2.5"/>
+          <text x="50" y="53" font-family="'Montserrat', sans-serif" font-size="11" font-weight="900" fill="#D4AF37" text-anchor="middle">FCP</text>
+        </svg>
+        <div class="brand-text">
+          <div class="brand-title">
+            <span>ESTÁDIO DO DRAGÃO</span>
+            <span class="brand-badge">360° VR GYRO</span>
+          </div>
+          <div class="brand-subtitle">Street View • Museu FC Porto • Giroscópio 360°</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- 🏛️ Quick Jump to Museu FC Porto -->
+        <button class="btn-action museum-quick-btn" onclick="selectZone('museu-fcporto')" title="Ir Diretamente ao Museu FC Porto by BMG">
+          🏛️ <span>Museu do Porto</span>
+        </button>
+
+        <!-- 🥽 Universal VR Button with Gyroscope -->
+        <button class="btn-action vr-btn" id="btn-open-vr-modal" title="Ativar Modo VR com Giroscópio 360°">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="6" width="20" height="12" rx="4"></rect>
+            <circle cx="8" cy="12" r="2.5"></circle>
+            <circle cx="16" cy="12" r="2.5"></circle>
+            <path d="M11 15h2"></path>
+          </svg>
+          <span>Modo VR 🧭</span>
+        </button>
+
+        <!-- 🎙️ Narrador do Estádio (Web Speech API) -->
+        <button class="btn-action narrator-btn" id="btn-toggle-narrator" title="Ativar / Desativar Narrador do Estádio">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+          <span id="narrator-btn-label">Narrador: OFF</span>
+        </button>
+
+        <!-- 🔊 Stadium Sound System Toggle -->
+        <button class="btn-action audio-btn" id="btn-toggle-stadium-audio" title="Ativar / Desativar Sons e Cânticos de Estádio">
+          <div class="sound-waves" id="sound-waves-indicator">
+            <div class="sound-bar"></div>
+            <div class="sound-bar"></div>
+            <div class="sound-bar"></div>
+            <div class="sound-bar"></div>
+          </div>
+          <span id="audio-btn-label">Som do Dragão</span>
+        </button>
+
+        <!-- ✨ Gemini AI Guide Button -->
+        <button class="btn-action ai-btn" id="btn-open-ai-modal" title="Perguntar ao Guia IA com Google Maps">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          <span>Guia IA</span>
+        </button>
+
+        <!-- 👤 Google Login / Member Fan Card -->
+        <button class="btn-action auth-btn" id="btn-open-auth-modal">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span id="header-auth-label">Entrar</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="main-workspace">
+      <!-- Mobile Sidebar Toggle -->
+      <button class="floating-toggle-sidebar" id="btn-toggle-sidebar">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <span>Zonas Reais</span>
+      </button>
+
+      <!-- Sidebar: Directory of all Real Stadium Zones -->
+      <aside class="zones-sidebar" id="zones-sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span>Zonas Reais do Dragão</span>
+          </div>
+          <span class="zones-count-badge" id="zones-count">8 Locais</span>
+        </div>
+
+        <div class="sidebar-scroll-list" id="sidebar-zones-list">
+          <!-- Dynamically populated from JS -->
+        </div>
+      </aside>
+
+      <!-- Center: Google Street View Full Viewport -->
+      <section class="streetview-stage">
+        <!-- Floating Chants Soundboard Overlay -->
+        <div class="stadium-chants-tray">
+          <span style="font-size:10px; font-weight:800; color:var(--fcp-gold-light); margin-right:4px;">🏟️ BANCADA & CLÁSSICO:</span>
+          <button class="chant-btn active-chant" onclick="playStadiumSound('classico')" title="Gritar Cântico de Clássico 'Porto, Porto, Porto!' com 50.000 adeptos">🔥 Grito de Clássico</button>
+          <button class="chant-btn" onclick="playStadiumSound('chant')" title="Tocar Cântico 'Somos Porto!'">📣 Somos Porto</button>
+          <button class="chant-btn" onclick="playStadiumSound('drum')" title="Ritmo de Bombo e Palmas dos Super Dragões">🥁 Bombo & Palmas</button>
+          <button class="chant-btn" onclick="playStadiumSound('horn')" title="Tocar Corneta de Bancada">🎺 Corneta</button>
+          <button class="chant-btn" onclick="playStadiumSound('goal')" title="Simular Explosão de Golo no Dragão">⚽ Clamor de Golo</button>
+        </div>
+
+        <div class="streetview-iframe-wrapper">
+          <iframe
+            id="streetview-iframe"
+            class="streetview-iframe"
+            src="about:blank"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Google Street View Estádio do Dragão">
+          </iframe>
+        </div>
+
+        <!-- Floating Bottom HUD with zone details, VR trigger & direct Google Maps link -->
+        <div class="stage-bottom-hud">
+          <div class="hud-info-left">
+            <div class="hud-zone-tag">
+              <span class="hud-tag-pill" id="hud-category-pill">Exterior / Monumento</span>
+              <span style="font-size:10.5px; color:#93C5FD; font-family:monospace;" id="hud-coords-pill">GPS: 41.161758, -8.583933</span>
+            </div>
+            <div class="hud-zone-title" id="hud-title-display">Praça do Dragão & Entrada Principal (Poente)</div>
+            <div class="hud-zone-desc" id="hud-desc-display">
+              A grande praça pedonal exterior do Estádio do Dragão, onde os adeptos se concentram em dias de jogo. Vista frontal para a icónica pala translúcida desenhada pelo arquiteto Manuel Salgado.
+            </div>
+          </div>
+
+          <div class="hud-actions-right">
+            <!-- 🎙️ Hear Zone History Narrator Trigger -->
+            <button class="btn-hud narrator-hud-btn" id="btn-hud-read-zone" onclick="playZoneNarrationExplicit()" title="Ouvir História Deste Local com o Narrador IA">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              </svg>
+              <span id="hud-narrate-btn-text">Ouvir História 🎙️</span>
+            </button>
+
+            <!-- Launch VR directly from HUD with Gyroscope -->
+            <button class="btn-hud vr-hud-btn" onclick="openVRModal()" title="Entrar em Realidade Virtual com Giroscópio 360°">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="6" width="20" height="12" rx="4"></rect>
+                <circle cx="8" cy="12" r="2.5"></circle>
+                <circle cx="16" cy="12" r="2.5"></circle>
+              </svg>
+              <span>VR com Giroscópio 🧭</span>
+            </button>
+
+            <button class="btn-hud" id="btn-fullscreen-toggle" title="Ecrã Completo">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+              </svg>
+              <span>Ecrã Completo</span>
+            </button>
+
+            <a class="btn-hud primary-maps" id="btn-open-google-maps" href="#" target="_blank" rel="noopener noreferrer">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              <span>Google Maps</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ==========================================================================
+       UNIVERSAL VR 360° + THREE.JS GYROSCOPE FULLSCREEN VIEWPORT
+       ========================================================================== -->
+  <div class="vr-fullscreen-container" id="vr-stereo-container">
+    <div class="vr-viewport-sbs">
+      <!-- Left Eye / WebGL 3D Photosphere with Gyroscope -->
+      <div class="vr-eye-half" id="vr-left-eye">
+        <canvas id="vr-canvas-left" class="vr-webgl-canvas"></canvas>
+        <iframe id="vr-iframe-left" class="vr-eye-frame" src="about:blank" allowfullscreen></iframe>
+        <div class="vr-reticle"></div>
+      </div>
+
+      <!-- Center Alignment Divider for Headsets -->
+      <div class="vr-center-divider" id="vr-divider"></div>
+
+      <!-- Right Eye / WebGL 3D Photosphere with Gyroscope -->
+      <div class="vr-eye-half" id="vr-right-eye">
+        <canvas id="vr-canvas-right" class="vr-webgl-canvas"></canvas>
+        <iframe id="vr-iframe-right" class="vr-eye-frame" src="about:blank" allowfullscreen></iframe>
+        <div class="vr-reticle"></div>
+      </div>
+    </div>
+
+    <!-- In-Headset Floating VR Controls -->
+    <div class="vr-inheadset-hud">
+      <div class="vr-hud-item">
+        <span>🥽 VR:</span>
+        <span id="vr-hud-current-zone" style="color:#FFF; font-weight:800;">Praça do Dragão</span>
+      </div>
+
+      <!-- Real-time Gyroscope Sensor Status Badge -->
+      <div class="vr-gyro-telemetry-badge" id="vr-gyro-status-badge">
+        <span id="vr-gyro-badge-label">🧭 360° Rastreio:</span>
+        <span id="vr-gyro-angles-text">0° / 0° / 0°</span>
+      </div>
+
+      <button class="vr-btn-control" onclick="prevVRZone()" title="Zona Anterior">◀ Anterior</button>
+      <button class="vr-btn-control" onclick="nextVRZone()" title="Próxima Zona">Próxima ▶</button>
+      <button class="vr-btn-control" onclick="recenterVRView()" title="Recentrar Olhar 360° para a Frente">🎯 Recentrar</button>
+      <button class="vr-btn-control" onclick="toggleVRStereoSplit()" id="btn-vr-split-toggle" title="Alternar entre Óculos VR (2 Ecrãs SBS) e Ecrã Único (Handheld)">🥽 2 Ecrãs (SBS)</button>
+      <button class="vr-btn-control" onclick="toggleVRViewMode()" id="btn-vr-mode-toggle" title="Alternar entre 3D WebGL e Google Street View">🔄 3D Gyro</button>
+      <button class="vr-btn-control" onclick="playZoneNarrationExplicit()" id="btn-vr-narrate" title="Ouvir História Narrada">🎙️ Narrar</button>
+      <button class="vr-btn-control" onclick="toggleStadiumAudioInVR()" id="btn-vr-audio-toggle" title="Som de Estádio">🔊 Som: ON</button>
+      <button class="vr-btn-control vr-btn-exit" onclick="exitVRMode()" title="Sair do Modo VR">❌ Sair</button>
+    </div>
+
+    <!-- Mobile Gyroscope Permission Dialog / CTA if needed -->
+    <div class="vr-permission-cta" id="vr-permission-prompt" style="display:none;">
+      <span style="font-size:12px; font-weight:700; color:#FFE58F;">📱 Ativar Rastreio por Giroscópio para olhar em 360° ao mover o telemóvel</span>
+      <button onclick="requestGyroPermissionExplicit()">Autorizar Giroscópio</button>
+    </div>
+  </div>
+
+  <!-- VR Setup & Mode Selection Modal -->
+  <div class="modal-backdrop" id="vr-select-modal">
+    <div class="modal-dialog">
+      <button class="modal-close-btn" id="btn-close-vr-modal">&times;</button>
+      
+      <div class="vr-modal-body">
+        <div style="width:48px; height:48px; border-radius:50%; background:#FF0055; display:flex; align-items:center; justify-content:center; box-shadow:0 0 16px rgba(255,0,85,0.6);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2">
+            <rect x="2" y="6" width="20" height="12" rx="4"></rect>
+            <circle cx="8" cy="12" r="2.5"></circle>
+            <circle cx="16" cy="12" r="2.5"></circle>
+            <path d="M11 15h2"></path>
+          </svg>
+        </div>
+
+        <div>
+          <h2 style="font-family:'Montserrat',sans-serif; font-size:17px; font-weight:900; color:#FFF;">
+            Modo VR com Giroscópio 360°
+          </h2>
+          <p style="font-size:12px; color:#A0C4FF; margin-top:4px;">
+            Compatível com todos os óculos VR (Cardboard, VR Box, Quest, Vision Pro) e telemóveis com sensores de orientação.
+          </p>
+        </div>
+
+        <div class="vr-modes-grid">
+          <!-- Option 1: Cardboard / Mobile VR / VR Box / Stereoscopic Split-Screen with Gyroscope -->
+          <div class="vr-mode-option" onclick="launchStereoVRMode(true)">
+            <div class="vr-option-icon">🥽</div>
+            <div class="vr-option-title">Óculos VR com Giroscópio (SBS)</div>
+            <div class="vr-option-desc">Visão dividida lado a lado com rastreio de cabeça 360° por giroscópio para Cardboard, BoboVR e VR Box.</div>
+          </div>
+
+          <!-- Option 2: Fullscreen Gyroscope (Handheld 360°) -->
+          <div class="vr-mode-option" onclick="launchGyroscopeMode()">
+            <div class="vr-option-icon">📱</div>
+            <div class="vr-option-title">360° Giroscópio na Mão</div>
+            <div class="vr-option-desc">Move o telemóvel livremente no ar para olhar em 360° em qualquer direção sem precisar de óculos.</div>
+          </div>
+
+          <!-- Option 3: Meta Quest / Vision Pro / WebXR Immersive -->
+          <div class="vr-mode-option" onclick="launchWebXRImmersive()">
+            <div class="vr-option-icon">🎮</div>
+            <div class="vr-option-title">Meta Quest / Vision Pro / WebXR</div>
+            <div class="vr-option-desc">Sessão VR Imersiva com rastreio de cabeça nativo de 6 graus de liberdade.</div>
+          </div>
+
+          <!-- Option 4: Sound Atmosphere in VR -->
+          <div class="vr-mode-option" onclick="startAudioAndLaunchVR()">
+            <div class="vr-option-icon">🔊</div>
+            <div class="vr-option-title">VR + Sons do Dragão</div>
+            <div class="vr-option-desc">Inicia a experiência imersiva com a atmosfera e os cânticos de 50.000 adeptos a cantar.</div>
+          </div>
+        </div>
+
+        <div style="font-size:10.5px; color:rgba(255,255,255,0.6); margin-top:6px;">
+          💡 Dica: No iPhone (Safari) e Android (Chrome), clica em "Autorizar Giroscópio" quando solicitado para rotação 360° automática.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Auth Modal -->
+  <div class="modal-backdrop" id="auth-modal">
+    <div class="modal-dialog">
+      <button class="modal-close-btn" id="btn-close-auth">&times;</button>
+      
+      <div class="auth-modal-body" id="auth-view-unlogged">
+        <svg class="auth-logo" viewBox="0 0 100 100">
+          <path d="M 50 5 L 85 20 L 85 60 C 85 80 50 95 50 95 C 50 95 15 80 15 60 L 15 20 Z" fill="#002B7F" stroke="#D4AF37" stroke-width="3"/>
+          <path d="M 38 20 L 38 80 M 62 20 L 62 80" stroke="#FFFFFF" stroke-width="8"/>
+          <circle cx="50" cy="48" r="18" fill="#001438" stroke="#D4AF37" stroke-width="2.5"/>
+          <text x="50" y="53" font-family="'Montserrat', sans-serif" font-size="11" font-weight="900" fill="#D4AF37" text-anchor="middle">FCP</text>
+        </svg>
+
+        <h2 class="auth-title">Entrar com a Conta Google</h2>
+        <p class="auth-subtitle">Inicia sessão para emitir o teu Cartão Digital de Adepto do FC Porto e aceder a informações exclusivas do Dragão.</p>
+
+        <button class="btn-google-sign" id="btn-do-google-login">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Continuar com a Conta Google</span>
+        </button>
+
+        <div style="font-size:10px; color:rgba(255,255,255,0.6); max-width:400px; margin-top:6px;">
+          ⚠️ Projeto comunitário desenvolvido por adeptos para adeptos sem afiliação oficial com a FC Porto SAD.
+        </div>
+      </div>
+
+      <!-- Fan Card View (Logged in) -->
+      <div class="auth-modal-body" id="auth-view-logged" style="display:none;">
+        <div class="fan-card">
+          <div class="fan-card-header">
+            <span style="font-size:10.5px; font-weight:800; color:var(--fcp-gold-light); letter-spacing:0.5px;">CARTÃO DIGITAL DE ADEPTO</span>
+            <span style="background:var(--fcp-gold); color:#001438; font-size:9px; font-weight:900; padding:2px 5px; border-radius:4px;">MEMBRO</span>
+          </div>
+          <div class="fan-card-name" id="card-user-name">GUSTAVO SILVA</div>
+          <div class="fan-card-email" id="card-user-email">sougustavo000@gmail.com</div>
+          <div class="fan-card-id" id="card-user-id">ID ADEPTO: #FCP-1893-9482</div>
+
+          <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:flex-end;">
+            <div style="font-size:9.5px; color:rgba(255,255,255,0.7);">
+              <div>ESTÁDIO DO DRAGÃO</div>
+              <div style="color:var(--fcp-gold); font-weight:700;">SOMOS PORTO • 1893</div>
+            </div>
+            <div style="background:#FFF; padding:4px; border-radius:4px;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#001438">
+                <rect x="2" y="2" width="8" height="8" rx="1"></rect>
+                <rect x="14" y="2" width="8" height="8" rx="1"></rect>
+                <rect x="2" y="14" width="8" height="8" rx="1"></rect>
+                <rect x="14" y="14" width="4" height="4"></rect>
+                <rect x="18" y="18" width="4" height="4"></rect>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; width:100%; max-width:400px; margin-top:8px;">
+          <button class="btn-action" style="flex:1; justify-content:center; background:#002B7F; border-color:var(--fcp-gold);" onclick="closeAuthModal()">Voltar ao Tour</button>
+          <button class="btn-action" style="background:rgba(255,255,255,0.1); justify-content:center;" onclick="handleGoogleSignOut()">Terminar Sessão</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gemini AI Guide Modal -->
+  <div class="modal-backdrop" id="ai-modal">
+    <div class="modal-dialog" style="max-width: 620px;">
+      <button class="modal-close-btn" id="btn-close-ai">&times;</button>
+      
+      <div class="ai-modal-header">
+        <div style="width:32px; height:32px; border-radius:50%; background:#4F46E5; display:flex; align-items:center; justify-content:center; box-shadow:0 0 10px rgba(99,102,241,0.5);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        </div>
+        <div>
+          <div style="font-family:'Montserrat',sans-serif; font-size:13.5px; font-weight:800; color:#FFF;">
+            Guia do Dragão • Google Maps IA
+          </div>
+          <div style="font-size:10.5px; color:#C7D2FE;">
+            Informações verificadas em tempo real com Gemini + Google Maps Grounding
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-chat-box" id="ai-chat-box">
+        <div class="ai-msg assistant">
+          <strong>🐉 Olá, Adepto do Dragão!</strong><br/>
+          Sou o assistente inteligente do Estádio do Dragão. Pergunta-me qualquer detalhe sobre transportes (Metro/Autocarros), horários do Museu FC Porto, Dragão Store, bilheteiras, estacionamento ou história das zonas do estádio!
+        </div>
+      </div>
+
+      <div class="ai-quick-pills">
+        <div class="ai-pill" onclick="sendQuickPrompt('Como chegar de Metro ao Estádio do Dragão?')">🚇 Como chegar de Metro?</div>
+        <div class="ai-pill" onclick="sendQuickPrompt('Quais os horários e visitas ao Museu FC Porto?')">🏆 Museu FC Porto e Tour</div>
+        <div class="ai-pill" onclick="sendQuickPrompt('Onde fica a Dragão Arena e que modalidades jogam lá?')">🏀 Dragão Arena</div>
+        <div class="ai-pill" onclick="sendQuickPrompt('Onde posso estacionar perto do estádio?')">🚗 Estacionamento</div>
+        <div class="ai-pill" onclick="sendQuickPrompt('Onde fica a Loja do Dragão oficial?')">🛍️ Loja do Dragão</div>
+      </div>
+
+      <div class="ai-input-bar">
+        <input type="text" id="ai-input-field" placeholder="Escreve uma pergunta sobre o Dragão..." onkeydown="if(event.key==='Enter')handleSendPrompt()">
+        <button id="btn-send-prompt" onclick="handleSendPrompt()">Perguntar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Real Existing Zones of Estádio do Dragão with verified Street View coordinates and panoramas
+    const REAL_DRAGAO_ZONES = [
+      {
+        id: "museu-fcporto",
+        name: "Museu FC Porto by BMG & Loja do Dragão",
+        category: "Cultura & Troféus",
+        coordinates: "41.162095, -8.584770",
+        description: "Espaço cultural premiado que acolhe mais de 130 anos de história do clube, as 2 Taças dos Campeões Europeus (1987, 2004), 2 Taças UEFA / Liga Europa (2003, 2011), Supertaça Europeia e as 2 Taças Intercontinentais.",
+        audioNarration: "Bem-vindo ao Museu FC Porto by BMG. Inaugurado em 2013 no vigésimo aniversário do Estádio do Dragão, este museu guarda a glória imortal dos Dragões: as duas Taças dos Campeões Europeus de 1987 e 2004, duas Ligas Europa, a Supertaça Europeia e duas Taças Intercontinentais. Um percurso emocionante por mais de cento e trinta anos de conquistas e paixão azul e branca.",
+        embedUrl: "https://www.google.com/maps?q=41.162095,-8.584770&layer=c&cbll=41.162095,-8.584770&cbp=12,65,,0,0&output=svembed",
+        directMapsUrl: "https://www.google.com/maps/search/?api=1&query=Museu+FC+Porto+by+BMG&utm_campaign=gmp_mcp_codeassist_v1_aistudio",
+        themeColor: "#D4AF37",
+        panoramaType: "museum"
+      },
+      {
+        id: "praca-dragao",
+        name: "Praça do Dragão & Entrada Principal (Poente)",
+        category: "Exterior / Monumento",
+        coordinates: "41.161758, -8.583933",
+        description: "A grande praça pedonal exterior do Estádio do Dragão, onde os adeptos se concentram em dias de jogo. Vista frontal para a icónica pala translúcida desenhada pelo arquiteto Manuel Salgado.",
+        audioNarration: "Estás na emblemática Praça do Dragão, a entrada poente do estádio. Daqui podes admirar a imponente pala translúcida concebida pelo arquiteto Manuel Salgado, suportada por mais de duzentas toneladas de aço branco. É o ponto de encontro sagrado dos adeptos portistas antes de cada grande noite europeia e de clássicos nacionais.",
+        embedUrl: "https://www.google.com/maps?q=41.161758,-8.583933&layer=c&cbll=41.161758,-8.583933&cbp=12,95,,0,5&output=svembed",
+        directMapsUrl: "https://www.google.com/maps/@41.161758,-8.583933,3a,75y,95h,90t/data=!3m6!1e1!3m4!1sCAoSLEFGMVFpcE1kczB4UFVXSlp1OHJ3V1pPekpPek0tQk1xekVvNWRuSWlJWWcx!2e0!7i16384!8i8192?utm_campaign=gmp_mcp_codeassist_v1_aistudio",
+        themeColor: "#0066FF",
+        panoramaType: "plaza"
+      },
+      {
+        id: "relvado-bancadas",
+        name: "Relvado Central & Visão Panorâmica 360°",
+        category: "Interior & Campo",
+        coordinates: "41.161758, -8.583600",
+        description: "Vista a partir do centro do terreno de jogo para as bancadas com capacidade para 50.033 espectadores, mosaicos FC PORTO e a monumental cobertura transparente.",
+        audioNarration: "Encontras-te no centro do relvado sagrado do Estádio do Dragão. Inaugurado a 16 de novembro de 2003 numa vitória histórica sobre o Barcelona, este palco com capacidade para mais de cinquenta mil espectadores acolheu o jogo de abertura do Euro 2004 e a final da Liga dos Campeões da UEFA de 2021.",
+        embedUrl: "https://www.google.com/maps?q=41.161758,-8.583933&layer=c&cbll=41.161758,-8.583933&cbp=12,180,,0,10&output=svembed",
+        directMapsUrl: "https://www.google.com/maps/place/Est%C3%A1dio+do+Drag%C3%A3o/@41.161758,-8.583933,17z?utm_campaign=gmp_mcp_codeassist_v1_aistudio",
+        themeColor: "#10B981",
+        panoramaType: "pitch"
+      },
+      {
+        id: "alameda-antas",
+        name: "Alameda das Antas & Estação de Metro",
+        category: "Acessos & Exterior",
+        coordinates: "41.162812, -8.582451",
+        description: "A grande alameda pedonal que liga a Estação de Metro 'Estádio do Dragão' (Linhas A, B, E, F) à Bancada Norte e ao Centro Comercial Alameda Shop & Spot.",
+        audioNarration: "Esta é a Alameda das Antas, a principal artéria pedonal que une a estação de metro terminal ao setor Norte do estádio. Por aqui passam dezenas de milhares de adeptos em cortejo festivo, vindos de toda a cidade do Porto e do aeroporto através das linhas diretas do Metro.",
+        embedUrl: "https://www.google.com/maps?q=41.162812,-8.582451&layer=c&cbll=41.162812,-8.582451&cbp=12,215,,0,-5&output=svembed",
+        directMapsUrl: "https://www.google.com/maps/@41.162812,-8.582451,3a,75y,215h,90t/data=!3m6!1e1!3m4!1sCAoSLEFGMVFpcE1NMG1JdFFiRzZ2M0FubmVWNmhZdkRldzZpMmNWOWRhbFl0UldE!2e0!7i16384!8i8192?utm_campaign=gmp_mcp_codeassist_v1_aistudio",
+        themeColor: "#38BDF8",
+        panoramaType: "metro"
+      },
+      {
+        id: "dragao-arena",
+        name: "Dragão Arena (Pavilhão das Modalidades)",
+        category: "Modalidades FC Porto",
+        coordinates: "41.160751, -8.584310",
+        description: "Pavilhão desportivo multiusos anexo ao estádio com capacidade para 2.179 espectadores, casa do Andebol, Basquetebol e Hóquei em Patins do FC Porto.",
+        audioNarration: "Estás em frente à Dragão Arena, o pavilhão multiusos inaugurado em 2009. Com capacidade para mais de dois mil espetadores, é o santuário das modalidades do FC Porto: Andebol, Basquetebol e Hóquei em Patins, palcos de dezenas de títulos europeus e campeonatos nacionais.",
+        embedUrl: "https://www.google.com/maps?q=41.160751,-8.584310&layer=c&cbll=41.160751,-8.584310&cbp=12,330,,0,0&output=svembed",
+        directMapsUrl: "https://www.google.com/maps/search/?api=1&query=Dragao+Arena+Porto&utm_campaign=gmp_mcp_codeassist_v1_aistudio",
+        themeColor: "#818CF8",
+        panoramaType: "arena"
+      },
+      {
+        id: "tribuna-presidencial",
+        name: "Tribuna VIP & Entrada Jorge Nuno Pinto da Costa",
+        category: "Área VIP & Presidência",
+        coordinates: "41.161550, -8.584200",
+        description: "Zona nobre do Estádio do Dragão, camarotes executivos corporativos, sala de imprensa e tribuna presidencial com vista privilegiada para o relvado.",
+        audioNarration: "Esta é a entrada nobre e a Tribuna Presidencial Jorge Nuno Pinto da Costa. Uma área de excelência onde se recebem delegações internacionais, presidentes de clubes da UEFA e personalidades mundiais, com acesso aos camarotes corporativos e auditório de imprensa.",
+        embedUrl: "https://www.google.com/maps?q=41.161550,-8.584200&layer=c&cbll=41.161550,-8.584200&cbp=12,90,,0,10&output=svembed",
+        directMapsUrl: "https://www.google.com/maps/place/Est%C3%A1dio+do+Drag%C3%A3o/@41.161758,-8.583933,17z?utm_campaign=gmp_mcp_codeassist_v1_aistudio",
+        themeColor: "#F59E0B",
+        panoramaType: "vip"
+      },
+      {
+        id: "bancada-nascente",
+        name: "Bancada Nascente (Exterior e Fachada de Vidro)",
+        category: "Arquitetura & Bancadas",
+        coordinates: "41.161300, -8.582800",
+        description: "Fachada oriental do estádio voltada para a Via de Cintura Interna (VCI), caracterizada pelas colunas de sustentação e estrutura de betão e vidro do Euro 2004.",
+        audioNarration: "Aqui podes contemplar a grandiosa fachada Nascente com as suas monumentais colunas de betão armado e panos de vidro temperado. Esta fachada orientada para a Via de Cintura Interna é um dos cartões de visita arquitetónicos mais reconhecidos da Invicta.",
+        embedUrl: "https://www.google.com/maps?q=41.161300,-8.582800&layer=c&cbll=41.161300,-8.582800&cbp=12,275,,0,5&output=svembed",
+        directMapsUrl: "https://www.google.com/maps/@41.161300,-8.582800,3a,75y,275h,90t/data=!3m6!1e1!3m4!1sCAoSLEFGMVFpcE1kczB4UFVXSlp1OHJ3V1pPekpPek0tQk1xekVvNWRuSWlJWWcx!2e0!7i16384!8i8192?utm_campaign=gmp_mcp_codeassist_v1_aistudio",
+        themeColor: "#0044B2",
+        panoramaType: "stands"
+      },
+      {
+        id: "topo-sul",
+        name: "Topo Sul & Porta 19 (Setor das Claques)",
+        category: "Bancadas & Claques",
+        coordinates: "41.160500, -8.583500",
+        description: "A bancada sul do estádio, tradicionalmente onde se posicionam as claques de apoio ao FC Porto (Super Dragões e Colectivo 95) criando o famoso 'Mar Azul'.",
+        audioNarration: "Estás junto à Porta 19 no Topo Sul do Dragão, a casa da claque e do pulsar dos cânticos de apoio. É nesta bancada que nasce a coreografia do Mar Azul que empurra a equipa do FC Porto em todas as batalhas em campo.",
+        embedUrl: "https://www.google.com/maps?q=41.160500,-8.583500&layer=c&cbll=41.160500,-8.583500&cbp=12,10,,0,8&output=svembed",
+        directMapsUrl: "https://www.google.com/maps/place/Est%C3%A1dio+do+Drag%C3%A3o/@41.160500,-8.583500,18z?utm_campaign=gmp_mcp_codeassist_v1_aistudio",
+        themeColor: "#002B7F",
+        panoramaType: "south"
+      }
+    ];
+
+    let currentZoneIndex = 0;
+    let currentZone = REAL_DRAGAO_ZONES[0];
+    let isUserLoggedIn = false;
+    let isVRActive = false;
+    let vrViewMode = '3d-gyro'; // '3d-gyro' or 'streetview'
+    let isStereoSplit = true;
+
+    // Stadium Narrator (Web Speech API) State
+    let isNarratorEnabled = true; // Auto-narrate on zone change if enabled
+    let isSpeakingNarration = false;
+    let currentUtterance = null;
+    let cachedVoices = [];
+
+    // Gyroscope & Screen Orientation tracking
+    let gyroSupported = false;
+    let gyroActive = false;
+    let hasRealGyroSignal = false;
+    let gyroAlpha = 0; // Z / Yaw
+    let gyroBeta = 90; // X / Pitch
+    let gyroGamma = 0; // Y / Roll
+    let baseZeroAlpha = 0;
+    let screenOrientationAngle = 0;
+
+    // Manual Touch / Mouse / Keyboard look controls
+    let isUserInteracting = false;
+    let onPointerDownPointerX = 0, onPointerDownPointerY = 0;
+    let onPointerDownLon = 0, onPointerDownLat = 0;
+    let lon = 0, lat = 0;
+    let cameraFov = 75;
+
+    // Three.js VR Engine instances
+    let rendererLeft = null, rendererRight = null;
+    let sceneLeft = null, sceneRight = null;
+    let cameraLeft = null, cameraRight = null;
+    let meshLeft = null, meshRight = null;
+    let animFrameId = null;
+
+    // Initialize DOM
+    document.addEventListener('DOMContentLoaded', () => {
+      buildZonesList();
+      selectZone(REAL_DRAGAO_ZONES[0].id, false); // initial without auto-speaking before interaction
+      setupEventListeners();
+      initGyroscopeListener();
+      initSpeechVoices();
+      updateScreenOrientationAngle();
+    });
+
+    function buildZonesList() {
+      const listEl = document.getElementById('sidebar-zones-list');
+      listEl.innerHTML = '';
+
+      REAL_DRAGAO_ZONES.forEach((zone, index) => {
+        const card = document.createElement('div');
+        card.className = `zone-card ${index === 0 ? 'active' : ''}`;
+        card.dataset.zoneId = zone.id;
+        card.innerHTML = `
+          <div class="zone-card-top">
+            <span class="zone-card-category" style="color:${zone.themeColor || '#70C5FF'};">${zone.category}</span>
+          </div>
+          <div class="zone-card-name">${zone.name}</div>
+          <div class="zone-card-coords">📍 ${zone.coordinates}</div>
+        `;
+        card.addEventListener('click', () => {
+          selectZone(zone.id);
+          if (window.innerWidth <= 900) {
+            document.getElementById('zones-sidebar').classList.remove('open');
+          }
+        });
+        listEl.appendChild(card);
+      });
+
+      document.getElementById('zones-count').textContent = `${REAL_DRAGAO_ZONES.length} Locais`;
+    }
+
+    function selectZone(zoneId, triggerNarration = true) {
+      const index = REAL_DRAGAO_ZONES.findIndex(z => z.id === zoneId);
+      if (index === -1) return;
+
+      currentZoneIndex = index;
+      const zone = REAL_DRAGAO_ZONES[index];
+      currentZone = zone;
+
+      // Update Active class in sidebar
+      document.querySelectorAll('.zone-card').forEach(c => {
+        c.classList.toggle('active', c.dataset.zoneId === zoneId);
+      });
+
+      // Update HUD Displays
+      document.getElementById('hud-category-pill').textContent = zone.category;
+      document.getElementById('hud-coords-pill').textContent = `GPS: ${zone.coordinates}`;
+      document.getElementById('hud-title-display').textContent = zone.name;
+      document.getElementById('hud-desc-display').textContent = zone.description;
+
+      // Update Direct Maps link
+      document.getElementById('btn-open-google-maps').href = zone.directMapsUrl;
+
+      // Update Iframe Source
+      const iframe = document.getElementById('streetview-iframe');
+      iframe.src = zone.embedUrl;
+
+      // Update In-VR HUD
+      const vrZoneLabel = document.getElementById('vr-hud-current-zone');
+      if (vrZoneLabel) vrZoneLabel.textContent = zone.name;
+
+      // If VR is open, update 3D texture and dual eye iframes
+      if (isVRActive) {
+        updateVRPhotosphereTexture(zone);
+        document.getElementById('vr-iframe-left').src = zone.embedUrl;
+        document.getElementById('vr-iframe-right').src = zone.embedUrl;
+      }
+
+      // 🎙️ Auto Narrate with Web Speech API if enabled and triggered by user action
+      if (triggerNarration && isNarratorEnabled) {
+        speakZoneDescription(zone);
+      }
+    }
+
+    function setupEventListeners() {
+      // Toggle sidebar on mobile
+      const sidebarToggle = document.getElementById('btn-toggle-sidebar');
+      const sidebar = document.getElementById('zones-sidebar');
+      sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+      });
+
+      // Fullscreen toggle
+      document.getElementById('btn-fullscreen-toggle').addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      });
+
+      // Narrator Toggle Button in Header
+      const narratorToggle = document.getElementById('btn-toggle-narrator');
+      if (narratorToggle) {
+        narratorToggle.addEventListener('click', toggleNarrator);
+      }
+
+      // Audio Toggle Button in Header
+      document.getElementById('btn-toggle-stadium-audio').addEventListener('click', toggleStadiumAudio);
+
+      // VR Modal Button
+      document.getElementById('btn-open-vr-modal').addEventListener('click', openVRModal);
+      document.getElementById('btn-close-vr-modal').addEventListener('click', closeVRModal);
+
+      // Google Auth Modal
+      document.getElementById('btn-open-auth-modal').addEventListener('click', openAuthModal);
+      document.getElementById('btn-close-auth').addEventListener('click', closeAuthModal);
+      document.getElementById('btn-do-google-login').addEventListener('click', handleGoogleLogin);
+
+      // AI Guide Modal
+      document.getElementById('btn-open-ai-modal').addEventListener('click', openAIModal);
+      document.getElementById('btn-close-ai').addEventListener('click', closeAIModal);
+
+      // Close modal on click outside
+      document.querySelectorAll('.modal-backdrop').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            modal.classList.remove('open');
+          }
+        });
+      });
+
+      // Pointer controls on VR container for manual look / drag
+      const vrContainer = document.getElementById('vr-stereo-container');
+      vrContainer.addEventListener('pointerdown', onPointerDown, false);
+      window.addEventListener('pointermove', onPointerMove, false);
+      window.addEventListener('pointerup', onPointerUp, false);
+      window.addEventListener('pointercancel', onPointerUp, false);
+
+      // Touch events for mobile VR interaction
+      vrContainer.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          onPointerDownPointerX = e.touches[0].pageX;
+          onPointerDownPointerY = e.touches[0].pageY;
+          onPointerDownLon = lon;
+          onPointerDownLat = lat;
+          isUserInteracting = true;
+        }
+      }, { passive: true });
+
+      vrContainer.addEventListener('touchmove', (e) => {
+        if (isUserInteracting && e.touches.length === 1) {
+          lon = (onPointerDownPointerX - e.touches[0].pageX) * 0.2 + onPointerDownLon;
+          lat = (e.touches[0].pageY - onPointerDownPointerY) * 0.2 + onPointerDownLat;
+          lat = Math.max(-85, Math.min(85, lat));
+        }
+      }, { passive: true });
+
+      vrContainer.addEventListener('touchend', () => {
+        isUserInteracting = false;
+      }, { passive: true });
+
+      // Mouse Wheel Zoom (adjust FOV in VR)
+      vrContainer.addEventListener('wheel', (e) => {
+        if (!isVRActive) return;
+        cameraFov = Math.max(40, Math.min(95, cameraFov + (e.deltaY > 0 ? 3 : -3)));
+        if (cameraLeft) {
+          cameraLeft.fov = cameraFov;
+          cameraLeft.updateProjectionMatrix();
+        }
+        if (cameraRight) {
+          cameraRight.fov = cameraFov;
+          cameraRight.updateProjectionMatrix();
+        }
+      }, { passive: true });
+
+      // Keyboard Controls for Desktop VR navigation
+      window.addEventListener('keydown', (e) => {
+        if (!isVRActive) return;
+        if (e.key === 'Escape') {
+          exitVRMode();
+        } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+          lon -= 3;
+        } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+          lon += 3;
+        } else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+          lat = Math.min(85, lat + 2.5);
+        } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+          lat = Math.max(-85, lat - 2.5);
+        } else if (e.key === ' ' || e.code === 'Space') {
+          if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            playZoneNarrationExplicit();
+          }
+        }
+      });
+
+      // Window Resize & Screen Orientation Change
+      window.addEventListener('resize', handleVRResize);
+      window.addEventListener('orientationchange', () => {
+        updateScreenOrientationAngle();
+        setTimeout(handleVRResize, 150);
+      });
+      document.addEventListener('fullscreenchange', handleVRResize);
+    }
+
+    function updateScreenOrientationAngle() {
+      if (window.screen && window.screen.orientation && typeof window.screen.orientation.angle === 'number') {
+        screenOrientationAngle = window.screen.orientation.angle;
+      } else if (typeof window.orientation === 'number') {
+        screenOrientationAngle = window.orientation;
+      } else {
+        screenOrientationAngle = 0;
+      }
+    }
+
+    function onPointerDown(event) {
+      if (!isVRActive || event.isPrimary === false) return;
+      // If clicking directly on a button in HUD, don't trigger drag
+      if (event.target.closest('.vr-inheadset-hud') || event.target.closest('.vr-permission-cta')) return;
+      isUserInteracting = true;
+      onPointerDownPointerX = event.clientX;
+      onPointerDownPointerY = event.clientY;
+      onPointerDownLon = lon;
+      onPointerDownLat = lat;
+    }
+
+    function onPointerMove(event) {
+      if (!isVRActive || event.isPrimary === false || !isUserInteracting) return;
+      lon = (onPointerDownPointerX - event.clientX) * 0.18 + onPointerDownLon;
+      lat = (event.clientY - onPointerDownPointerY) * 0.18 + onPointerDownLat;
+      lat = Math.max(-85, Math.min(85, lat));
+    }
+
+    function onPointerUp(event) {
+      isUserInteracting = false;
+    }
+
+    function recenterVRView() {
+      baseZeroAlpha = gyroAlpha;
+      lon = 0;
+      lat = 0;
+    }
+
+    /* ==========================================================================
+       GYROSCOPE / DEVICE ORIENTATION SENSORS (THREE.JS COMPATIBLE)
+       ========================================================================== */
+    function initGyroscopeListener() {
+      if ('ondeviceorientation' in window || window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', onDeviceOrientationChange, true);
+        window.addEventListener('deviceorientationabsolute', onDeviceOrientationChange, true);
+        gyroSupported = true;
+      }
+    }
+
+    async function requestGyroPermissionExplicit() {
+      // 1. Generic Permissions API check (Chrome/Android/Sensors)
+      if (navigator.permissions && navigator.permissions.query) {
+        try {
+          const result = await navigator.permissions.query({ name: 'accelerometer' });
+          if (result.state === 'granted') {
+            gyroActive = true;
+          }
+        } catch (e) {}
+        try {
+          const resultGyro = await navigator.permissions.query({ name: 'gyroscope' });
+          if (resultGyro.state === 'granted') {
+            gyroActive = true;
+          }
+        } catch (e) {}
+      }
+
+      // 2. iOS 13+ DeviceOrientationEvent.requestPermission API
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        try {
+          const permissionState = await DeviceOrientationEvent.requestPermission();
+          if (permissionState === 'granted') {
+            window.addEventListener('deviceorientation', onDeviceOrientationChange, true);
+            window.addEventListener('deviceorientationabsolute', onDeviceOrientationChange, true);
+            gyroActive = true;
+            document.getElementById('vr-permission-prompt').style.display = 'none';
+            updateGyroBadge(true);
+          } else {
+            console.warn("Permissão de giroscópio recusada no dispositivo.");
+          }
+        } catch (err) {
+          console.error("Erro ao pedir permissão de orientação:", err);
+        }
+      } else {
+        // Standard Android / Web standard DeviceOrientation listener
+        window.addEventListener('deviceorientation', onDeviceOrientationChange, true);
+        window.addEventListener('deviceorientationabsolute', onDeviceOrientationChange, true);
+        document.getElementById('vr-permission-prompt').style.display = 'none';
+      }
+    }
+
+    function onDeviceOrientationChange(event) {
+      if (event.alpha !== null && event.beta !== null) {
+        // Confirm real hardware sensor activity
+        const isReal = Math.abs(event.alpha) > 0.0001 || Math.abs(event.beta) > 0.0001 || Math.abs(event.gamma || 0) > 0.0001;
+        if (isReal) {
+          hasRealGyroSignal = true;
+          gyroActive = true;
+        }
+        gyroAlpha = event.alpha || 0;
+        gyroBeta = event.beta || 0;
+        gyroGamma = event.gamma || 0;
+
+        // Update real-time angles text in HUD
+        const anglesEl = document.getElementById('vr-gyro-angles-text');
+        if (anglesEl) {
+          anglesEl.textContent = `Y:${Math.round(gyroAlpha)}° P:${Math.round(gyroBeta)}° R:${Math.round(gyroGamma)}°`;
+        }
+        updateGyroBadge(hasRealGyroSignal && gyroActive);
+      }
+    }
+
+    function updateGyroBadge(active) {
+      const badge = document.getElementById('vr-gyro-status-badge');
+      const label = document.getElementById('vr-gyro-badge-label');
+      if (badge) {
+        badge.classList.toggle('inactive', !active);
+      }
+      if (label) {
+        label.textContent = active ? '🧭 Giroscópio Ativo:' : '🖱️ Rastreio 360°:';
+      }
+    }
+
+    /* ==========================================================================
+       THREE.JS WEBGL 3D PHOTOSPHERE PANORAMAS ENGINE
+       ========================================================================== */
+    function createProceduralPhotosphere(zone) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 2048;
+      canvas.height = 1024;
+      const ctx = canvas.getContext('2d');
+
+      if (zone.panoramaType === 'museum') {
+        // === MUSEU FC PORTO BY BMG INTERIOR ATMOSPHERE ===
+        // Premium museum lighting & deep blue walls
+        const wallGrad = ctx.createLinearGradient(0, 0, 0, 1024);
+        wallGrad.addColorStop(0, '#020617');
+        wallGrad.addColorStop(0.3, '#001438');
+        wallGrad.addColorStop(0.6, '#002B7F');
+        wallGrad.addColorStop(0.85, '#0B1528');
+        wallGrad.addColorStop(1, '#02040A');
+        ctx.fillStyle = wallGrad;
+        ctx.fillRect(0, 0, 2048, 1024);
+
+        // Ceiling spotlights
+        for (let x = 100; x < 2048; x += 220) {
+          const spotGrad = ctx.createRadialGradient(x, 100, 10, x, 500, 260);
+          spotGrad.addColorStop(0, 'rgba(255, 235, 150, 0.45)');
+          spotGrad.addColorStop(0.5, 'rgba(212, 175, 55, 0.15)');
+          spotGrad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = spotGrad;
+          ctx.fillRect(x - 200, 0, 400, 700);
+        }
+
+        // Museum Floor Tiles with reflections
+        ctx.fillStyle = '#0F172A';
+        ctx.fillRect(0, 560, 2048, 464);
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.3)';
+        ctx.lineWidth = 2;
+        for (let x = 0; x < 2048; x += 160) {
+          ctx.beginPath();
+          ctx.moveTo(x, 560);
+          ctx.lineTo(x + 80, 1024);
+          ctx.stroke();
+        }
+
+        // Trophy Showcases (Glass Vitrines)
+        ctx.fillStyle = 'rgba(212, 175, 55, 0.2)';
+        ctx.strokeStyle = '#D4AF37';
+        ctx.lineWidth = 3;
+
+        // Big Championship Trophy Standings
+        const trophies = [
+          { name: "Taça dos Campeões 1987 (Viena)", x: 300 },
+          { name: "UEFA Champions League 2004 (Gelsenkirchen)", x: 650 },
+          { name: "Taça Intercontinental 1987 & 2004 (Tóquio)", x: 1024 },
+          { name: "Taça UEFA 2003 (Sevilha)", x: 1400 },
+          { name: "Liga Europa 2011 (Dublim)", x: 1750 }
+        ];
+
+        trophies.forEach(t => {
+          // Vitrine base
+          ctx.fillStyle = '#1E293B';
+          ctx.fillRect(t.x - 110, 520, 220, 180);
+          ctx.strokeRect(t.x - 110, 520, 220, 180);
+
+          // Glowing Trophy
+          ctx.fillStyle = '#FFE58F';
+          ctx.shadowColor = '#D4AF37';
+          ctx.shadowBlur = 25;
+          ctx.beginPath();
+          ctx.arc(t.x, 470, 38, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Cup Handles
+          ctx.strokeStyle = '#D4AF37';
+          ctx.lineWidth = 6;
+          ctx.strokeRect(t.x - 46, 445, 92, 45);
+          ctx.shadowBlur = 0;
+
+          // Label
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = 'bold 15px Montserrat, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(t.name, t.x, 560);
+        });
+
+        // Giant Museum Header Banner
+        ctx.fillStyle = '#D4AF37';
+        ctx.font = 'bold 44px Montserrat, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🏛️ MUSEU FC PORTO BY BMG • SALA DOS TROFÉUS EUROPEUS', 1024, 300);
+
+        ctx.fillStyle = '#93C5FD';
+        ctx.font = '22px Montserrat, sans-serif';
+        ctx.fillText('130+ Anos de História • 7 Títulos Internacionais • Coleção Permanente', 1024, 350);
+
+      } else {
+        // === REAL ESTÁDIO DO DRAGÃO 360° ARENA PANORAMA ===
+        // 1. Sky & Stadium Light Towers
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, 480);
+        skyGrad.addColorStop(0, '#071633');
+        skyGrad.addColorStop(0.5, '#0E3370');
+        skyGrad.addColorStop(1, '#2563EB');
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, 2048, 480);
+
+        // 2. Manuel Salgado's Iconic Translucent Curved Canopy Roof
+        ctx.fillStyle = 'rgba(240, 246, 255, 0.45)';
+        ctx.beginPath();
+        ctx.ellipse(1024, 180, 960, 130, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        // White Steel Trusses (Pala do Dragão)
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 3;
+        for (let i = 80; i < 2048; i += 70) {
+          ctx.beginPath();
+          ctx.moveTo(i, 80);
+          ctx.lineTo(i + 30, 280);
+          ctx.stroke();
+        }
+
+        // 3. Floodlights (Holofotes de Alta Potência)
+        for (let f = 200; f < 2000; f += 400) {
+          const lightGlow = ctx.createRadialGradient(f, 120, 10, f, 120, 120);
+          lightGlow.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+          lightGlow.addColorStop(0.4, 'rgba(255, 255, 255, 0.4)');
+          lightGlow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          ctx.fillStyle = lightGlow;
+          ctx.fillRect(f - 120, 0, 240, 240);
+        }
+
+        // 4. Stadium Grandstands (50.033 Seats / Bancadas Azul e Branco)
+        // Top tier
+        ctx.fillStyle = '#002B7F';
+        ctx.fillRect(0, 280, 2048, 120);
+
+        // FC PORTO mosaic on stand
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '900 68px Montserrat, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('FC PORTO', 512, 365);
+        ctx.fillText('ESTÁDIO DO DRAGÃO', 1536, 365);
+
+        // Stand rows texture (Simulating packed fans in Blue & White)
+        for (let y = 280; y < 510; y += 10) {
+          ctx.fillStyle = (y % 20 === 0) ? '#FFFFFF' : '#0038A8';
+          ctx.fillRect(0, y, 2048, 7);
+          // Crowd confetti dots
+          for (let x = 10; x < 2048; x += 25) {
+            if (Math.random() > 0.4) {
+              ctx.fillStyle = Math.random() > 0.5 ? '#93C5FD' : '#FFFFFF';
+              ctx.fillRect(x, y - 2, 4, 4);
+            }
+          }
+        }
+
+        // LED Pitch-side Banners
+        ctx.fillStyle = '#001438';
+        ctx.fillRect(0, 500, 2048, 30);
+        ctx.strokeStyle = '#D4AF37';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(0, 500, 2048, 30);
+
+        ctx.fillStyle = '#D4AF37';
+        ctx.font = 'bold 16px Montserrat, sans-serif';
+        ctx.textAlign = 'center';
+        for (let x = 200; x < 2048; x += 400) {
+          ctx.fillText('🐉 SOMOS PORTO • 1893 • SUPER BOCK • BMG', x, 521);
+        }
+
+        // 5. Emerald Green Natural Grass Pitch (Relvado Natural)
+        const pitchGrad = ctx.createLinearGradient(0, 530, 0, 1024);
+        pitchGrad.addColorStop(0, '#15803D');
+        pitchGrad.addColorStop(0.3, '#166534');
+        pitchGrad.addColorStop(0.7, '#14532D');
+        pitchGrad.addColorStop(1, '#052E16');
+        ctx.fillStyle = pitchGrad;
+        ctx.fillRect(0, 530, 2048, 494);
+
+        // Pitch Striping (Lawn Mower Bands)
+        for (let x = 0; x < 2048; x += 100) {
+          if ((x / 100) % 2 === 0) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+            ctx.fillRect(x, 530, 100, 494);
+          }
+        }
+
+        // White Pitch Lines (Center Circle, Touchlines, Penalty Box)
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 5;
+
+        // Center line
+        ctx.beginPath();
+        ctx.moveTo(1024, 530);
+        ctx.lineTo(1024, 1024);
+        ctx.stroke();
+
+        // Center Circle
+        ctx.beginPath();
+        ctx.ellipse(1024, 750, 240, 110, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Center Spot
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(1024, 750, 10, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Goal Nets on Left & Right
+        [240, 1808].forEach(gx => {
+          ctx.strokeStyle = '#FFFFFF';
+          ctx.lineWidth = 4;
+          ctx.strokeRect(gx - 70, 540, 140, 80);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+          ctx.fillRect(gx - 70, 540, 140, 80);
+        });
+
+        // 6. Current Zone Title Billboard in 3D Arena
+        ctx.fillStyle = 'rgba(0, 20, 56, 0.85)';
+        ctx.fillRect(724, 400, 600, 70);
+        ctx.strokeStyle = '#D4AF37';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(724, 400, 600, 70);
+
+        ctx.fillStyle = '#FFE58F';
+        ctx.font = 'bold 22px Montserrat, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(zone.name.toUpperCase(), 1024, 442);
+      }
+
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    const _zee = typeof THREE !== 'undefined' ? new THREE.Vector3(0, 0, 1) : null;
+    const _euler = typeof THREE !== 'undefined' ? new THREE.Euler() : null;
+    const _q0 = typeof THREE !== 'undefined' ? new THREE.Quaternion() : null;
+    const _q1 = typeof THREE !== 'undefined' ? new THREE.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)) : null;
+
+    function initThreeVR() {
+      if (typeof THREE === 'undefined') return;
+
+      const leftCanvas = document.getElementById('vr-canvas-left');
+      const rightCanvas = document.getElementById('vr-canvas-right');
+      const leftEyeHalf = document.getElementById('vr-left-eye');
+      const rightEyeHalf = document.getElementById('vr-right-eye');
+
+      const wLeft = leftEyeHalf.clientWidth || (window.innerWidth / (isStereoSplit ? 2 : 1));
+      const hLeft = leftEyeHalf.clientHeight || window.innerHeight;
+
+      // Left Eye Three.js Setup
+      if (!rendererLeft) {
+        sceneLeft = new THREE.Scene();
+        cameraLeft = new THREE.PerspectiveCamera(cameraFov, wLeft / hLeft, 0.1, 1500);
+        cameraLeft.position.set(0, 0, 0);
+
+        rendererLeft = new THREE.WebGLRenderer({ canvas: leftCanvas, antialias: true, alpha: false, powerPreference: "high-performance" });
+        rendererLeft.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        rendererLeft.setSize(wLeft, hLeft);
+
+        const geometry = new THREE.SphereGeometry(600, 64, 48);
+        geometry.scale(-1, 1, 1);
+
+        const texture = createProceduralPhotosphere(currentZone);
+        const material = new THREE.MeshBasicMaterial({ map: texture });
+        meshLeft = new THREE.Mesh(geometry, material);
+        sceneLeft.add(meshLeft);
+      } else {
+        rendererLeft.setSize(wLeft, hLeft);
+        cameraLeft.fov = cameraFov;
+        cameraLeft.aspect = wLeft / hLeft;
+        cameraLeft.updateProjectionMatrix();
+      }
+
+      // Right Eye Three.js Setup
+      const wRight = rightEyeHalf.clientWidth || (window.innerWidth / 2);
+      const hRight = rightEyeHalf.clientHeight || window.innerHeight;
+
+      if (!rendererRight) {
+        sceneRight = new THREE.Scene();
+        cameraRight = new THREE.PerspectiveCamera(cameraFov, wRight / hRight, 0.1, 1500);
+        cameraRight.position.set(0, 0, 0);
+
+        rendererRight = new THREE.WebGLRenderer({ canvas: rightCanvas, antialias: true, alpha: false, powerPreference: "high-performance" });
+        rendererRight.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        rendererRight.setSize(wRight, hRight);
+
+        const geometryRight = new THREE.SphereGeometry(600, 64, 48);
+        geometryRight.scale(-1, 1, 1);
+
+        const textureRight = createProceduralPhotosphere(currentZone);
+        const materialRight = new THREE.MeshBasicMaterial({ map: textureRight });
+        meshRight = new THREE.Mesh(geometryRight, materialRight);
+        sceneRight.add(meshRight);
+      } else {
+        rendererRight.setSize(wRight, hRight);
+        cameraRight.fov = cameraFov;
+        cameraRight.aspect = wRight / hRight;
+        cameraRight.updateProjectionMatrix();
+      }
+
+      // Start render loop if not running
+      if (!animFrameId) {
+        animateVR();
+      }
+    }
+
+    function handleVRResize() {
+      if (!isVRActive || typeof THREE === 'undefined') return;
+      const leftEyeHalf = document.getElementById('vr-left-eye');
+      const rightEyeHalf = document.getElementById('vr-right-eye');
+
+      const wLeft = leftEyeHalf.clientWidth || (window.innerWidth / (isStereoSplit ? 2 : 1));
+      const hLeft = leftEyeHalf.clientHeight || window.innerHeight;
+
+      if (rendererLeft && cameraLeft) {
+        rendererLeft.setSize(wLeft, hLeft);
+        cameraLeft.aspect = wLeft / hLeft;
+        cameraLeft.updateProjectionMatrix();
+      }
+
+      if (isStereoSplit && rendererRight && cameraRight) {
+        const wRight = rightEyeHalf.clientWidth || (window.innerWidth / 2);
+        const hRight = rightEyeHalf.clientHeight || window.innerHeight;
+        rendererRight.setSize(wRight, hRight);
+        cameraRight.aspect = wRight / hRight;
+        cameraRight.updateProjectionMatrix();
+      }
+    }
+
+    function updateVRPhotosphereTexture(zone) {
+      if (!meshLeft || !meshRight || typeof THREE === 'undefined') return;
+      const texture = createProceduralPhotosphere(zone);
+      meshLeft.material.map = texture;
+      meshLeft.material.needsUpdate = true;
+      meshRight.material.map = texture;
+      meshRight.material.needsUpdate = true;
+    }
+
+    function applyVRCameraOrientation(camera) {
+      if (typeof THREE === 'undefined' || !camera) return;
+
+      if (hasRealGyroSignal && gyroActive) {
+        // Gyroscope tracking on mobile
+        const alphaRad = THREE.MathUtils.degToRad((gyroAlpha - baseZeroAlpha) + lon);
+        const betaRad = THREE.MathUtils.degToRad(gyroBeta);
+        const gammaRad = THREE.MathUtils.degToRad(-gyroGamma);
+        const orientRad = THREE.MathUtils.degToRad(screenOrientationAngle);
+
+        _euler.set(betaRad, alphaRad, gammaRad, 'YXZ');
+        camera.quaternion.setFromEuler(_euler);
+        camera.quaternion.multiply(_q1);
+        camera.quaternion.multiply(_q0.setFromAxisAngle(_zee, -orientRad));
+
+        // Pitch adjustment from touch drag if user dragged vertically
+        if (Math.abs(lat) > 0.1) {
+          const pitchOffset = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(-lat));
+          camera.quaternion.multiply(pitchOffset);
+        }
+      } else {
+        // Drag / mouse / keyboard navigation for desktop and non-sensor browsers
+        const clampedLat = Math.max(-85, Math.min(85, lat));
+        const phi = THREE.MathUtils.degToRad(90 - clampedLat);
+        const theta = THREE.MathUtils.degToRad(lon);
+
+        const targetX = 600 * Math.sin(phi) * Math.cos(theta);
+        const targetY = 600 * Math.cos(phi);
+        const targetZ = 600 * Math.sin(phi) * Math.sin(theta);
+
+        camera.lookAt(targetX, targetY, targetZ);
+      }
+    }
+
+    function animateVR() {
+      animFrameId = requestAnimationFrame(animateVR);
+      if (!isVRActive) return;
+
+      if (cameraLeft) applyVRCameraOrientation(cameraLeft);
+      if (isStereoSplit && cameraRight) applyVRCameraOrientation(cameraRight);
+
+      // Render viewports
+      if (rendererLeft && sceneLeft && cameraLeft) {
+        rendererLeft.render(sceneLeft, cameraLeft);
+      }
+      if (isStereoSplit && rendererRight && sceneRight && cameraRight) {
+        rendererRight.render(sceneRight, cameraRight);
+      }
+    }
+
+    /* ==========================================================================
+       REALISTIC STADIUM AUDIO SYNTHESIZER & AMBIENCE (WEB AUDIO API)
+       ========================================================================== */
+    let audioCtx = null;
+    let isAudioPlaying = false;
+    let masterGain = null;
+    let crowdNoiseNode = null;
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
+
+        masterGain = audioCtx.createGain();
+        masterGain.gain.setValueAtTime(0.7, audioCtx.currentTime);
+        masterGain.connect(audioCtx.destination);
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function toggleStadiumAudio() {
+      initAudioContext();
+
+      if (!isAudioPlaying) {
+        startContinuousAmbience();
+        isAudioPlaying = true;
+        document.getElementById('btn-toggle-stadium-audio').classList.add('playing');
+        document.getElementById('audio-btn-label').textContent = 'Som: A Tocar 🔊';
+        document.getElementById('btn-vr-audio-toggle').textContent = '🔊 Som: ON';
+      } else {
+        stopContinuousAmbience();
+        isAudioPlaying = false;
+        document.getElementById('btn-toggle-stadium-audio').classList.remove('playing');
+        document.getElementById('audio-btn-label').textContent = 'Som do Dragão';
+        document.getElementById('btn-vr-audio-toggle').textContent = '🔇 Som: OFF';
+      }
+    }
+
+    function toggleStadiumAudioInVR() {
+      toggleStadiumAudio();
+    }
+
+    function startContinuousAmbience() {
+      if (!audioCtx) return;
+
+      const bufferSize = audioCtx.sampleRate * 3;
+      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.08;
+        b6 = white * 0.115926;
+      }
+
+      const whiteNoise = audioCtx.createBufferSource();
+      whiteNoise.buffer = noiseBuffer;
+      whiteNoise.loop = true;
+
+      const bandpass = audioCtx.createBiquadFilter();
+      bandpass.type = "bandpass";
+      bandpass.frequency.setValueAtTime(380, audioCtx.currentTime);
+      bandpass.Q.setValueAtTime(1.8, audioCtx.currentTime);
+
+      const lowpass = audioCtx.createBiquadFilter();
+      lowpass.type = "lowpass";
+      lowpass.frequency.setValueAtTime(1200, audioCtx.currentTime);
+
+      const ambienceGain = audioCtx.createGain();
+      ambienceGain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+
+      whiteNoise.connect(bandpass);
+      bandpass.connect(lowpass);
+      lowpass.connect(ambienceGain);
+      ambienceGain.connect(masterGain);
+
+      whiteNoise.start();
+      crowdNoiseNode = { source: whiteNoise, gain: ambienceGain };
+    }
+
+    function stopContinuousAmbience() {
+      if (crowdNoiseNode && crowdNoiseNode.source) {
+        try {
+          crowdNoiseNode.source.stop();
+          crowdNoiseNode.source.disconnect();
+        } catch (e) {}
+        crowdNoiseNode = null;
+      }
+    }
+
+    function playStadiumSound(type) {
+      initAudioContext();
+      const now = audioCtx.currentTime;
+
+      if (type === 'chant' || type === 'classico') {
+        // "FILHOS DO DRAGÃO / SOMOS PORTO" Clássico Chanting Roar
+        // Layer 1: Massive 50k crowd roaring noise surge
+        const bufferSize = audioCtx.sampleRate * 4.5;
+        const roarBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = roarBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.sin((i / bufferSize) * Math.PI);
+        }
+        const roarSrc = audioCtx.createBufferSource();
+        roarSrc.buffer = roarBuffer;
+
+        const roarFilter = audioCtx.createBiquadFilter();
+        roarFilter.type = "bandpass";
+        roarFilter.frequency.setValueAtTime(450, now);
+        roarFilter.Q.setValueAtTime(1.5, now);
+
+        const roarGain = audioCtx.createGain();
+        roarGain.gain.setValueAtTime(0.01, now);
+        roarGain.gain.linearRampToValueAtTime(0.9, now + 0.6);
+        roarGain.gain.exponentialRampToValueAtTime(0.01, now + 4.5);
+
+        roarSrc.connect(roarFilter);
+        roarFilter.connect(roarGain);
+        roarGain.connect(masterGain);
+        roarSrc.start(now);
+
+        // Layer 2: Harmonic vocal melody chant ("PORTO, PORTO, PORTO!")
+        const fcpMelody = [220, 261.6, 293.6, 329.6, 392.0, 440.0, 392.0, 329.6, 440.0];
+        const rhythm = [0, 0.35, 0.7, 1.1, 1.6, 2.0, 2.4, 2.8, 3.4];
+        
+        fcpMelody.forEach((freq, idx) => {
+          const t = now + rhythm[idx];
+          // Create 4 detuned oscillators to sound like a stadium crowd shouting together
+          [-8, -3, 3, 8].forEach(detune => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = "sawtooth";
+            osc.frequency.setValueAtTime(freq, t);
+            osc.detune.setValueAtTime(detune * 4, t);
+
+            const vocalFilter = audioCtx.createBiquadFilter();
+            vocalFilter.type = "bandpass";
+            vocalFilter.frequency.setValueAtTime(650, t);
+            vocalFilter.Q.setValueAtTime(2.0, t);
+
+            gain.gain.setValueAtTime(0.001, t);
+            gain.gain.linearRampToValueAtTime(0.22, t + 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
+
+            osc.connect(vocalFilter);
+            vocalFilter.connect(gain);
+            gain.connect(masterGain);
+            osc.start(t);
+            osc.stop(t + 0.4);
+          });
+        });
+
+        // Layer 3: Synchronized heavy bass drum kicks
+        [0, 0.7, 1.6, 2.4, 3.4].forEach(offset => {
+          triggerDrumBeat(now + offset);
+        });
+
+      } else if (type === 'drum') {
+        const beats = [0, 0.4, 0.8, 1.1, 1.3, 1.6, 2.1, 2.6, 3.0, 3.4];
+        beats.forEach((t) => {
+          triggerDrumBeat(now + t);
+        });
+      } else if (type === 'horn') {
+        const hornNotes = [261.6, 329.6, 392.0, 523.2];
+        const hornTimes = [0, 0.25, 0.5, 0.9];
+        hornTimes.forEach((t, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(hornNotes[i], now + t);
+          gain.gain.setValueAtTime(0.35, now + t);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + t + 0.45);
+          osc.connect(gain);
+          gain.connect(masterGain);
+          osc.start(now + t);
+          osc.stop(now + t + 0.5);
+        });
+      } else if (type === 'goal') {
+        // Massive Goal Roar in Clássico
+        const bufferSize = audioCtx.sampleRate * 5;
+        const roarBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = roarBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1);
+        }
+        const roarSrc = audioCtx.createBufferSource();
+        roarSrc.buffer = roarBuffer;
+
+        const roarFilter = audioCtx.createBiquadFilter();
+        roarFilter.type = "lowpass";
+        roarFilter.frequency.setValueAtTime(300, now);
+        roarFilter.frequency.exponentialRampToValueAtTime(1600, now + 0.6);
+        roarFilter.frequency.exponentialRampToValueAtTime(600, now + 4.5);
+
+        const roarGain = audioCtx.createGain();
+        roarGain.gain.setValueAtTime(0.01, now);
+        roarGain.gain.linearRampToValueAtTime(1.0, now + 0.4);
+        roarGain.gain.exponentialRampToValueAtTime(0.01, now + 5.0);
+
+        roarSrc.connect(roarFilter);
+        roarFilter.connect(roarGain);
+        roarGain.connect(masterGain);
+        roarSrc.start(now);
+
+        // Clássico Shouts & Whistles
+        for (let i = 0; i < 16; i++) {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "sawtooth";
+          const freq = 200 + Math.random() * 400;
+          osc.frequency.setValueAtTime(freq, now + Math.random() * 0.3);
+          osc.frequency.linearRampToValueAtTime(freq + 200, now + 1.5);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.linearRampToValueAtTime(0.25, now + 0.8);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 4.0);
+          osc.connect(gain);
+          gain.connect(masterGain);
+          osc.start(now);
+          osc.stop(now + 4.2);
+        }
+      }
+    }
+
+    function triggerDrumBeat(t) {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.frequency.setValueAtTime(150, t);
+      osc.frequency.exponentialRampToValueAtTime(38, t + 0.18);
+      gain.gain.setValueAtTime(0.8, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+      osc.connect(gain);
+      gain.connect(masterGain);
+      osc.start(t);
+      osc.stop(t + 0.35);
+    }
+
+    /* ==========================================================================
+       NARRADOR DO ESTÁDIO (WEB SPEECH API SYNTHESIS)
+       ========================================================================== */
+    function initSpeechVoices() {
+      if ('speechSynthesis' in window) {
+        cachedVoices = window.speechSynthesis.getVoices();
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+          window.speechSynthesis.onvoiceschanged = () => {
+            cachedVoices = window.speechSynthesis.getVoices();
+          };
+        }
+      }
+    }
+
+    function getBestPortugueseVoice() {
+      if (!cachedVoices || cachedVoices.length === 0) {
+        cachedVoices = window.speechSynthesis.getVoices();
+      }
+      // Look for European Portuguese (pt-PT) first, then pt-BR, then any PT
+      const ptPT = cachedVoices.find(v => v.lang === 'pt-PT' || v.lang === 'pt_PT');
+      if (ptPT) return ptPT;
+      const ptBR = cachedVoices.find(v => v.lang.startsWith('pt'));
+      if (ptBR) return ptBR;
+      return null;
+    }
+
+    function toggleNarrator() {
+      isNarratorEnabled = !isNarratorEnabled;
+      const btn = document.getElementById('btn-toggle-narrator');
+      const label = document.getElementById('narrator-btn-label');
+
+      if (isNarratorEnabled) {
+        btn.classList.add('narrating');
+        label.textContent = 'Narrador: ON 🎙️';
+        // Read current zone immediately
+        speakZoneDescription(currentZone);
+      } else {
+        btn.classList.remove('narrating');
+        label.textContent = 'Narrador: OFF';
+        stopNarration();
+      }
+    }
+
+    function stopNarration() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      isSpeakingNarration = false;
+      updateNarratorUIState(false);
+    }
+
+    function playZoneNarrationExplicit() {
+      // If currently speaking, clicking will stop or restart
+      if (isSpeakingNarration) {
+        stopNarration();
+      } else {
+        speakZoneDescription(currentZone, true);
+      }
+    }
+
+    function speakZoneDescription(zone, force = false) {
+      if (!('speechSynthesis' in window)) {
+        console.warn("Speech Synthesis API não suportada neste browser.");
+        return;
+      }
+
+      if (!isNarratorEnabled && !force) {
+        return;
+      }
+
+      // Cancel previous speech if running
+      window.speechSynthesis.cancel();
+
+      const textToSpeak = zone.audioNarration || `${zone.name}. ${zone.description}`;
+
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      currentUtterance = utterance;
+      utterance.lang = 'pt-PT';
+      utterance.rate = 1.02; // natural cadence
+      utterance.pitch = 1.0;
+
+      const voice = getBestPortugueseVoice();
+      if (voice) {
+        utterance.voice = voice;
+      }
+
+      utterance.onstart = () => {
+        isSpeakingNarration = true;
+        updateNarratorUIState(true);
+      };
+
+      utterance.onend = () => {
+        isSpeakingNarration = false;
+        updateNarratorUIState(false);
+      };
+
+      utterance.onerror = (e) => {
+        console.log("Speech utterance event:", e);
+        isSpeakingNarration = false;
+        updateNarratorUIState(false);
+      };
+
+      // Resume speech synthesis if browser suspended it
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function updateNarratorUIState(speaking) {
+      const hudBtn = document.getElementById('btn-hud-read-zone');
+      const hudText = document.getElementById('hud-narrate-btn-text');
+      const headerBtn = document.getElementById('btn-toggle-narrator');
+      const vrNarrateBtn = document.getElementById('btn-vr-narrate');
+
+      if (speaking) {
+        if (hudBtn) hudBtn.classList.add('active-speaking');
+        if (hudText) hudText.textContent = 'A Narrar... ⏹️';
+        if (headerBtn) headerBtn.classList.add('narrating');
+        if (vrNarrateBtn) {
+          vrNarrateBtn.textContent = '⏹️ Parar Voz';
+          vrNarrateBtn.style.background = '#EC4899';
+        }
+      } else {
+        if (hudBtn) hudBtn.classList.remove('active-speaking');
+        if (hudText) hudText.textContent = 'Ouvir História 🎙️';
+        if (headerBtn && !isNarratorEnabled) headerBtn.classList.remove('narrating');
+        if (vrNarrateBtn) {
+          vrNarrateBtn.textContent = '🎙️ Narrar';
+          vrNarrateBtn.style.background = '';
+        }
+      }
+    }
+
+    /* ==========================================================================
+       VR MODE LAUNCHERS (SBS, GYROSCOPE, WEBXR)
+       ========================================================================== */
+    function openVRModal() {
+      document.getElementById('vr-select-modal').classList.add('open');
+    }
+    function closeVRModal() {
+      document.getElementById('vr-select-modal').classList.remove('open');
+    }
+
+    function launchStereoVRMode(stereo = true) {
+      closeVRModal();
+      isVRActive = true;
+      isStereoSplit = stereo;
+      vrViewMode = '3d-gyro';
+
+      const container = document.getElementById('vr-stereo-container');
+      container.classList.add('active');
+
+      const leftCanvas = document.getElementById('vr-canvas-left');
+      const rightCanvas = document.getElementById('vr-canvas-right');
+      const leftIframe = document.getElementById('vr-iframe-left');
+      const rightIframe = document.getElementById('vr-iframe-right');
+      const rightEye = document.getElementById('vr-right-eye');
+      const divider = document.getElementById('vr-divider');
+      const splitBtn = document.getElementById('btn-vr-split-toggle');
+      const modeBtn = document.getElementById('btn-vr-mode-toggle');
+
+      leftCanvas.style.display = 'block';
+      rightCanvas.style.display = 'block';
+      leftIframe.style.display = 'none';
+      rightIframe.style.display = 'none';
+      if (modeBtn) modeBtn.textContent = '🔄 3D Gyro';
+
+      if (!stereo) {
+        rightEye.style.display = 'none';
+        divider.style.display = 'none';
+        if (splitBtn) splitBtn.textContent = '📱 1 Ecrã (Cheio)';
+      } else {
+        rightEye.style.display = 'flex';
+        divider.style.display = 'block';
+        if (splitBtn) splitBtn.textContent = '🥽 2 Ecrãs (SBS)';
+      }
+
+      document.getElementById('vr-hud-current-zone').textContent = currentZone.name;
+
+      // Initialize Three.js VR Engine
+      initThreeVR();
+      setTimeout(() => {
+        handleVRResize();
+        updateVRPhotosphereTexture(currentZone);
+      }, 50);
+
+      // Check Gyroscope Permission requirement for iOS / Android
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function' && !hasRealGyroSignal) {
+        document.getElementById('vr-permission-prompt').style.display = 'flex';
+      } else {
+        requestGyroPermissionExplicit();
+      }
+
+      // Request fullscreen for immersive smartphone VR / Cardboard
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+    }
+
+    function toggleVRStereoSplit() {
+      isStereoSplit = !isStereoSplit;
+      const rightEye = document.getElementById('vr-right-eye');
+      const divider = document.getElementById('vr-divider');
+      const splitBtn = document.getElementById('btn-vr-split-toggle');
+
+      if (!isStereoSplit) {
+        rightEye.style.display = 'none';
+        divider.style.display = 'none';
+        if (splitBtn) splitBtn.textContent = '📱 1 Ecrã (Cheio)';
+      } else {
+        rightEye.style.display = 'flex';
+        divider.style.display = 'block';
+        if (splitBtn) splitBtn.textContent = '🥽 2 Ecrãs (SBS)';
+      }
+      setTimeout(handleVRResize, 30);
+    }
+
+    function launchGyroscopeMode() {
+      launchStereoVRMode(false);
+    }
+
+    let xrSession = null;
+
+    async function launchWebXRImmersive() {
+      closeVRModal();
+      if (navigator.xr && navigator.xr.isSessionSupported) {
+        try {
+          const supported = await navigator.xr.isSessionSupported('immersive-vr');
+          if (supported) {
+            xrSession = await navigator.xr.requestSession('immersive-vr', {
+              optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking']
+            });
+
+            // If WebXR immersive session is successfully created (e.g. inside Meta Quest browser)
+            xrSession.addEventListener('end', () => {
+              xrSession = null;
+              exitVRMode();
+            });
+
+            launchStereoVRMode(true);
+            return;
+          }
+        } catch (err) {
+          console.warn('WebXR native immersive session request handled:', err);
+        }
+      }
+      // Fallback seamlessly to stereoscopic 360 gyro mode
+      launchStereoVRMode(true);
+    }
+
+    function startAudioAndLaunchVR() {
+      if (!isAudioPlaying) {
+        toggleStadiumAudio();
+      }
+      launchStereoVRMode(true);
+    }
+
+    function toggleVRViewMode() {
+      const leftCanvas = document.getElementById('vr-canvas-left');
+      const rightCanvas = document.getElementById('vr-canvas-right');
+      const leftIframe = document.getElementById('vr-iframe-left');
+      const rightIframe = document.getElementById('vr-iframe-right');
+      const btn = document.getElementById('btn-vr-mode-toggle');
+
+      if (vrViewMode === '3d-gyro') {
+        vrViewMode = 'streetview';
+        leftCanvas.style.display = 'none';
+        rightCanvas.style.display = 'none';
+        leftIframe.style.display = 'block';
+        rightIframe.style.display = 'block';
+        leftIframe.src = currentZone.embedUrl;
+        rightIframe.src = currentZone.embedUrl;
+        if (btn) btn.textContent = '🌐 Street View';
+      } else {
+        vrViewMode = '3d-gyro';
+        leftIframe.style.display = 'none';
+        rightIframe.style.display = 'none';
+        leftCanvas.style.display = 'block';
+        rightCanvas.style.display = 'block';
+        updateVRPhotosphereTexture(currentZone);
+        if (btn) btn.textContent = '🔄 3D Gyro';
+      }
+    }
+
+    function exitVRMode() {
+      isVRActive = false;
+      document.getElementById('vr-stereo-container').classList.remove('active');
+      document.getElementById('vr-permission-prompt').style.display = 'none';
+
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    function nextVRZone() {
+      currentZoneIndex = (currentZoneIndex + 1) % REAL_DRAGAO_ZONES.length;
+      selectZone(REAL_DRAGAO_ZONES[currentZoneIndex].id);
+    }
+
+    function prevVRZone() {
+      currentZoneIndex = (currentZoneIndex - 1 + REAL_DRAGAO_ZONES.length) % REAL_DRAGAO_ZONES.length;
+      selectZone(REAL_DRAGAO_ZONES[currentZoneIndex].id);
+    }
+
+    /* ==========================================================================
+       GOOGLE AUTH & AI GUIDE FLOWS
+       ========================================================================== */
+    function openAuthModal() {
+      document.getElementById('auth-modal').classList.add('open');
+    }
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.remove('open');
+    }
+
+    function handleGoogleLogin() {
+      isUserLoggedIn = true;
+      document.getElementById('auth-view-unlogged').style.display = 'none';
+      document.getElementById('auth-view-logged').style.display = 'flex';
+      document.getElementById('header-auth-label').textContent = 'Cartão de Sócio';
+    }
+
+    function handleGoogleSignOut() {
+      isUserLoggedIn = false;
+      document.getElementById('auth-view-unlogged').style.display = 'flex';
+      document.getElementById('auth-view-logged').style.display = 'none';
+      document.getElementById('header-auth-label').textContent = 'Entrar';
+      closeAuthModal();
+    }
+
+    function openAIModal() {
+      document.getElementById('ai-modal').classList.add('open');
+      document.getElementById('ai-input-field').focus();
+    }
+    function closeAIModal() {
+      document.getElementById('ai-modal').classList.remove('open');
+    }
+
+    function sendQuickPrompt(promptText) {
+      document.getElementById('ai-input-field').value = promptText;
+      handleSendPrompt();
+    }
+
+    async function handleSendPrompt() {
+      const input = document.getElementById('ai-input-field');
+      const query = input.value.trim();
+      if (!query) return;
+
+      input.value = '';
+      const chatBox = document.getElementById('ai-chat-box');
+
+      const userDiv = document.createElement('div');
+      userDiv.className = 'ai-msg user';
+      userDiv.textContent = query;
+      chatBox.appendChild(userDiv);
+
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'ai-msg assistant';
+      loadingDiv.innerHTML = '<em>A consultar Google Maps sobre o Estádio do Dragão e Museu...</em>';
+      chatBox.appendChild(loadingDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      try {
+        const res = await fetch('/api/gemini/dragao-info', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: query })
+        });
+
+        const data = await res.json();
+        loadingDiv.remove();
+
+        const assistantDiv = document.createElement('div');
+        assistantDiv.className = 'ai-msg assistant';
+
+        if (data.error) {
+          assistantDiv.style.borderColor = '#EF4444';
+          assistantDiv.textContent = `❌ ${data.error}`;
+        } else {
+          const formatted = data.text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n\n/g, '<br/><br/>')
+            .replace(/\n/g, '<br/>');
+
+          let html = `<div>${formatted}</div>`;
+          if (data.mapSources && data.mapSources.length > 0) {
+            html += `<div style="margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.2);"><strong>📍 Locais Google Maps:</strong><br/>`;
+            data.mapSources.forEach(src => {
+              const safeUri = src.uri ? `${src.uri}&utm_campaign=gmp_mcp_codeassist_v1_aistudio` : '#';
+              html += `<a href="${safeUri}" target="_blank" rel="noopener noreferrer" style="color:#60A5FA; text-decoration:underline; display:block; margin-top:4px;">🗺️ ${src.title || 'Ver no Google Maps'} &rarr;</a>`;
+            });
+            html += `</div>`;
+          }
+          assistantDiv.innerHTML = html;
+        }
+
+        chatBox.appendChild(assistantDiv);
+      } catch (e) {
+        loadingDiv.remove();
+        const errDiv = document.createElement('div');
+        errDiv.className = 'ai-msg assistant';
+        errDiv.style.borderColor = '#EF4444';
+        errDiv.textContent = '❌ Não foi possível obter resposta no momento. Verifica a ligação ao servidor.';
+        chatBox.appendChild(errDiv);
+      }
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>

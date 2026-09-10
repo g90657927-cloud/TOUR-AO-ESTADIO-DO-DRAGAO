@@ -13,6 +13,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
+  <!-- Firebase App & Firebase Auth & Firestore SDKs (Compat v10) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
   <style>
     :root {
       --fcp-blue: #002B7F;
@@ -1219,20 +1224,21 @@
       transform: rotate(90deg);
     }
 
-    /* Google Auth & Digital Fan Card */
+    /* Firebase Auth & Digital Fan Card */
     .auth-modal-body {
-      padding: 30px 24px;
+      padding: 24px 20px;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
+      width: 100%;
     }
 
     .auth-logo {
-      width: 64px;
-      height: 64px;
-      margin-bottom: 4px;
+      width: 56px;
+      height: 56px;
+      margin-bottom: 2px;
       filter: drop-shadow(0 4px 12px rgba(0, 43, 127, 0.6));
     }
 
@@ -1241,37 +1247,208 @@
       font-size: 18px;
       font-weight: 900;
       color: #FFF;
+      margin-bottom: 2px;
     }
 
     .auth-subtitle {
-      font-size: 12.5px;
+      font-size: 12px;
       color: #94A3B8;
-      line-height: 1.5;
+      line-height: 1.45;
       max-width: 440px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .auth-tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .auth-tab-btn.active {
+      background: var(--fcp-blue);
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(0, 43, 127, 0.5);
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 380px;
+      text-align: left;
+    }
+
+    .auth-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .auth-input-group label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #CBD5E1;
+    }
+
+    .auth-input {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 9px;
+      padding: 9px 13px;
+      color: #FFF;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s ease;
+      width: 100%;
+    }
+
+    .auth-input:focus {
+      border-color: var(--fcp-accent-blue);
+      background: rgba(255, 255, 255, 0.09);
+    }
+
+    .auth-input::placeholder {
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    .btn-firebase-primary {
+      background: linear-gradient(135deg, #002B7F 0%, #0052CC 100%);
+      color: #FFFFFF;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      padding: 10px 18px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(0, 43, 127, 0.4);
+    }
+
+    .btn-firebase-primary:hover {
+      background: linear-gradient(135deg, #0037A3 0%, #0066FF 100%);
+      border-color: var(--fcp-gold);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(0, 82, 204, 0.5);
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      max-width: 380px;
+      margin: 2px 0;
+    }
+
+    .auth-divider::before, .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .auth-divider span {
+      font-size: 10.5px;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .btn-google-sign {
       background: #FFFFFF;
       color: #1F2937;
       border: none;
-      padding: 12px 24px;
-      border-radius: 10px;
-      font-size: 13.5px;
+      padding: 10px 18px;
+      border-radius: 9px;
+      font-size: 13px;
       font-weight: 700;
       display: flex;
       align-items: center;
       gap: 10px;
       cursor: pointer;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
       transition: all 0.2s ease;
       width: 100%;
-      max-width: 360px;
+      max-width: 380px;
       justify-content: center;
     }
 
     .btn-google-sign:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 22px rgba(255, 255, 255, 0.2);
+      background: #F8FAFC;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.18);
+    }
+
+    .btn-anon-sign {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #94A3B8;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+      max-width: 380px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-anon-sign:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #FFFFFF;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .auth-alert-box {
+      width: 100%;
+      max-width: 380px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      display: none;
+      text-align: left;
+      line-height: 1.4;
+    }
+
+    .auth-alert-box.error {
+      display: block;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #FCA5A5;
+    }
+
+    .auth-alert-box.success {
+      display: block;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #6EE7B7;
     }
 
     /* Fan Digital VIP Card */
@@ -2251,11 +2428,12 @@
     </div>
   </div>
 
-  <!-- Google Auth Modal -->
+  <!-- Firebase Auth Modal -->
   <div class="modal-backdrop" id="auth-modal">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="max-width: 460px;">
       <button class="modal-close-btn" id="btn-close-auth">&times;</button>
       
+      <!-- Unlogged View: Firebase Sign In / Sign Up -->
       <div class="auth-modal-body" id="auth-view-unlogged">
         <svg class="auth-logo" viewBox="0 0 100 100">
           <path d="M 50 5 L 85 20 L 85 60 C 85 80 50 95 50 95 C 50 95 15 80 15 60 L 15 20 Z" fill="#002B7F" stroke="#D4AF37" stroke-width="3"/>
@@ -2264,39 +2442,93 @@
           <text x="50" y="53" font-family="'Montserrat', sans-serif" font-size="11" font-weight="900" fill="#D4AF37" text-anchor="middle">FCP</text>
         </svg>
 
-        <h2 class="auth-title">Entrar com a Conta Google</h2>
-        <p class="auth-subtitle">Inicia sessão para emitir o teu Cartão Digital de Adepto do FC Porto e aceder a informações exclusivas do Dragão.</p>
+        <h2 class="auth-title">Autenticação Firebase • FC Porto</h2>
+        <p class="auth-subtitle">Inicia sessão com a tua conta Firebase para emitires o teu Cartão Digital de Adepto do Dragão sincronizado na Cloud.</p>
 
-        <button class="btn-google-sign" id="btn-do-google-login">
+        <!-- Auth Alert Message Box -->
+        <div id="auth-alert-message" class="auth-alert-box"></div>
+
+        <!-- Auth Tabs: Entrar / Criar Conta -->
+        <div class="auth-tabs">
+          <button class="auth-tab-btn active" id="tab-auth-login" onclick="switchAuthTab('login')">Entrar</button>
+          <button class="auth-tab-btn" id="tab-auth-register" onclick="switchAuthTab('register')">Criar Conta</button>
+        </div>
+
+        <!-- Login Form -->
+        <form class="auth-form" id="form-firebase-login" onsubmit="handleFirebaseEmailLogin(event)">
+          <div class="auth-input-group">
+            <label for="fb-login-email">Email</label>
+            <input type="email" id="fb-login-email" class="auth-input" placeholder="exemplo@email.com" required autocomplete="username" />
+          </div>
+          <div class="auth-input-group">
+            <label for="fb-login-password">Palavra-passe</label>
+            <input type="password" id="fb-login-password" class="auth-input" placeholder="••••••••" required autocomplete="current-password" />
+          </div>
+          <button type="submit" class="btn-firebase-primary" id="btn-fb-submit-login">
+            <span>Entrar com Firebase</span>
+          </button>
+        </form>
+
+        <!-- Register Form (Hidden by default) -->
+        <form class="auth-form" id="form-firebase-register" style="display:none;" onsubmit="handleFirebaseEmailRegister(event)">
+          <div class="auth-input-group">
+            <label for="fb-reg-name">Nome de Adepto</label>
+            <input type="text" id="fb-reg-name" class="auth-input" placeholder="Ex: Gustavo Silva" required />
+          </div>
+          <div class="auth-input-group">
+            <label for="fb-reg-email">Email</label>
+            <input type="email" id="fb-reg-email" class="auth-input" placeholder="exemplo@email.com" required autocomplete="username" />
+          </div>
+          <div class="auth-input-group">
+            <label for="fb-reg-password">Palavra-passe (mínimo 6 caracteres)</label>
+            <input type="password" id="fb-reg-password" class="auth-input" placeholder="••••••••" required minlength="6" autocomplete="new-password" />
+          </div>
+          <button type="submit" class="btn-firebase-primary" id="btn-fb-submit-reg">
+            <span>Criar Conta Firebase</span>
+          </button>
+        </form>
+
+        <div class="auth-divider">
+          <span>ou</span>
+        </div>
+
+        <!-- Google OAuth via Firebase Provider -->
+        <button type="button" class="btn-google-sign" id="btn-do-firebase-google" onclick="handleFirebaseGoogleLogin()">
           <svg width="18" height="18" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
           </svg>
-          <span>Continuar com a Conta Google</span>
+          <span>Continuar com Google (Firebase)</span>
         </button>
 
-        <div style="font-size:10px; color:rgba(255,255,255,0.6); max-width:400px; margin-top:6px;">
-          ⚠️ Projeto comunitário desenvolvido por adeptos para adeptos sem afiliação oficial com a FC Porto SAD.
+        <!-- Anonymous Guest Login via Firebase -->
+        <button type="button" class="btn-anon-sign" id="btn-do-firebase-anon" onclick="handleFirebaseAnonymousLogin()">
+          <span>👤 Entrar como Convidado Anónimo (Firebase)</span>
+        </button>
+
+        <div style="font-size:10px; color:rgba(255,255,255,0.6); max-width:400px; margin-top:2px;">
+          🔥 Autenticação segura gerida por Firebase Auth com persistência Cloud Firestore.
         </div>
       </div>
 
-      <!-- Fan Card View (Logged in) -->
+      <!-- Fan Card View (Logged in via Firebase) -->
       <div class="auth-modal-body" id="auth-view-logged" style="display:none;">
         <div class="fan-card">
           <div class="fan-card-header">
             <span style="font-size:10.5px; font-weight:800; color:var(--fcp-gold-light); letter-spacing:0.5px;">CARTÃO DIGITAL DE ADEPTO</span>
-            <span style="background:var(--fcp-gold); color:#001438; font-size:9px; font-weight:900; padding:2px 5px; border-radius:4px;">MEMBRO</span>
+            <span style="background:var(--fcp-gold); color:#001438; font-size:9px; font-weight:900; padding:2px 6px; border-radius:4px;" id="card-badge-status">SÓCIO VIP</span>
           </div>
           <div class="fan-card-name" id="card-user-name">GUSTAVO SILVA</div>
           <div class="fan-card-email" id="card-user-email">sougustavo000@gmail.com</div>
           <div class="fan-card-id" id="card-user-id">ID ADEPTO: #FCP-1893-9482</div>
 
-          <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:flex-end;">
+          <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:flex-end;">
             <div style="font-size:9.5px; color:rgba(255,255,255,0.7);">
               <div>ESTÁDIO DO DRAGÃO</div>
               <div style="color:var(--fcp-gold); font-weight:700;">SOMOS PORTO • 1893</div>
+              <div style="font-size:8.5px; color:#60A5FA; margin-top:2px;" id="card-provider-tag">🔥 Autenticado com Firebase</div>
             </div>
             <div style="background:#FFF; padding:4px; border-radius:4px;">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="#001438">
@@ -2312,7 +2544,7 @@
 
         <div style="display:flex; gap:10px; width:100%; max-width:400px; margin-top:8px;">
           <button class="btn-action" style="flex:1; justify-content:center; background:#002B7F; border-color:var(--fcp-gold);" onclick="closeAuthModal()">Voltar ao Tour</button>
-          <button class="btn-action" style="background:rgba(255,255,255,0.1); justify-content:center;" onclick="handleGoogleSignOut()">Terminar Sessão</button>
+          <button class="btn-action" style="background:rgba(239,68,68,0.2); border:1px solid rgba(239,68,68,0.4); justify-content:center; color:#FCA5A5;" onclick="handleFirebaseSignOut()">Terminar Sessão</button>
         </div>
       </div>
     </div>
@@ -2635,6 +2867,7 @@
 
     // Initialize DOM
     document.addEventListener('DOMContentLoaded', () => {
+      initFirebaseAuth();
       buildZonesList();
       selectZone(REAL_DRAGAO_ZONES[0].id, false);
       setupEventListeners();
@@ -2790,13 +3023,11 @@
         audioToggle.addEventListener('click', toggleStadiumAudio);
       }
 
-      // Google Auth Modal
+      // Firebase Auth Modal
       const authBtn = document.getElementById('btn-open-auth-modal');
       const authClose = document.getElementById('btn-close-auth');
-      const loginBtn = document.getElementById('btn-do-google-login');
       if (authBtn) authBtn.addEventListener('click', openAuthModal);
       if (authClose) authClose.addEventListener('click', closeAuthModal);
-      if (loginBtn) loginBtn.addEventListener('click', handleGoogleLogin);
 
       // AI Guide Modal
       const aiBtn = document.getElementById('btn-open-ai-modal');
@@ -3447,34 +3678,302 @@
     }
 
     /* ==========================================================================
-       GOOGLE AUTH & AI GUIDE FLOWS
+       FIREBASE AUTH & FIRESTORE REAL-TIME PERSISTENCE
        ========================================================================== */
+    let firebaseAuth = null;
+    let firestoreDb = null;
+    let currentUser = null;
+
+    const firebaseConfig = {
+      projectId: "project-91936604-f726-41c3-a9b",
+      appId: "1:683817922548:web:1525c82f94778dce6a53a1",
+      apiKey: "AIzaSyAmY0zGiLZsuuorbZxxe1gjyQEyor71lOI",
+      authDomain: "project-91936604-f726-41c3-a9b.firebaseapp.com",
+      firestoreDatabaseId: "ai-studio-visitavirtual3da-7887fc91-897b-4689-a70c-37f9db52ddf4",
+      storageBucket: "project-91936604-f726-41c3-a9b.firebasestorage.app",
+      messagingSenderId: "683817922548"
+    };
+
+    function initFirebaseAuth() {
+      try {
+        if (typeof firebase !== 'undefined') {
+          if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+          }
+          firebaseAuth = firebase.auth();
+          firestoreDb = firebase.firestore();
+
+          // Listen to Firebase Auth state changes
+          firebaseAuth.onAuthStateChanged(async (user) => {
+            currentUser = user;
+            if (user) {
+              isUserLoggedIn = true;
+              await updateFanCardWithUserData(user);
+              showLoggedInUI(user);
+            } else {
+              isUserLoggedIn = false;
+              showLoggedOutUI();
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Firebase init warning:', err);
+      }
+    }
+
+    function showAuthAlert(message, type = 'error') {
+      const alertBox = document.getElementById('auth-alert-message');
+      if (!alertBox) return;
+      alertBox.textContent = message;
+      alertBox.className = `auth-alert-box ${type}`;
+    }
+
+    function clearAuthAlert() {
+      const alertBox = document.getElementById('auth-alert-message');
+      if (!alertBox) return;
+      alertBox.className = 'auth-alert-box';
+      alertBox.textContent = '';
+    }
+
+    function switchAuthTab(tab) {
+      clearAuthAlert();
+      const loginTabBtn = document.getElementById('tab-auth-login');
+      const regTabBtn = document.getElementById('tab-auth-register');
+      const loginForm = document.getElementById('form-firebase-login');
+      const regForm = document.getElementById('form-firebase-register');
+
+      if (tab === 'login') {
+        if (loginTabBtn) loginTabBtn.classList.add('active');
+        if (regTabBtn) regTabBtn.classList.remove('active');
+        if (loginForm) loginForm.style.display = 'flex';
+        if (regForm) regForm.style.display = 'none';
+      } else {
+        if (loginTabBtn) loginTabBtn.classList.remove('active');
+        if (regTabBtn) regTabBtn.classList.add('active');
+        if (loginForm) loginForm.style.display = 'none';
+        if (regForm) regForm.style.display = 'flex';
+      }
+    }
+
+    async function handleFirebaseEmailLogin(e) {
+      if (e) e.preventDefault();
+      clearAuthAlert();
+      const email = document.getElementById('fb-login-email').value.trim();
+      const password = document.getElementById('fb-login-password').value;
+      const submitBtn = document.getElementById('btn-fb-submit-login');
+
+      if (!email || !password) {
+        showAuthAlert('Por favor preenche todos os campos.', 'error');
+        return;
+      }
+
+      try {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'A autenticar...';
+        }
+        await firebaseAuth.signInWithEmailAndPassword(email, password);
+        showAuthAlert('Autenticado com sucesso!', 'success');
+      } catch (err) {
+        console.error('Firebase Login Error:', err);
+        let msg = 'Erro ao iniciar sessão com Firebase.';
+        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {
+          msg = 'Email ou palavra-passe incorretos.';
+        } else if (err.code === 'auth/invalid-email') {
+          msg = 'O formato do email é inválido.';
+        } else if (err.code === 'auth/too-many-requests') {
+          msg = 'Muitas tentativas falhadas. Tenta novamente mais tarde.';
+        }
+        showAuthAlert(msg, 'error');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Entrar com Firebase';
+        }
+      }
+    }
+
+    async function handleFirebaseEmailRegister(e) {
+      if (e) e.preventDefault();
+      clearAuthAlert();
+      const name = document.getElementById('fb-reg-name').value.trim();
+      const email = document.getElementById('fb-reg-email').value.trim();
+      const password = document.getElementById('fb-reg-password').value;
+      const submitBtn = document.getElementById('btn-fb-submit-reg');
+
+      if (!name || !email || !password) {
+        showAuthAlert('Por favor preenche todos os campos de registo.', 'error');
+        return;
+      }
+
+      if (password.length < 6) {
+        showAuthAlert('A palavra-passe deve ter no mínimo 6 caracteres.', 'error');
+        return;
+      }
+
+      try {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'A criar conta...';
+        }
+        const userCredential = await firebaseAuth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        // Update display name in Firebase Auth
+        if (user && name) {
+          await user.updateProfile({ displayName: name });
+        }
+
+        // Save initial profile in Firestore
+        if (firestoreDb && user) {
+          const fanCardNumber = `FCP-1893-${Math.floor(1000 + Math.random() * 9000)}`;
+          await firestoreDb.collection('users').doc(user.uid).set({
+            id: user.uid,
+            email: user.email,
+            displayName: name,
+            fanCardNumber: fanCardNumber,
+            createdAt: new Date().toISOString()
+          }, { merge: true });
+        }
+
+        showAuthAlert('Conta criada com sucesso!', 'success');
+      } catch (err) {
+        console.error('Firebase Register Error:', err);
+        let msg = 'Erro ao criar conta no Firebase.';
+        if (err.code === 'auth/email-already-in-use') {
+          msg = 'Este endereço de email já se encontra registado.';
+        } else if (err.code === 'auth/invalid-email') {
+          msg = 'O formato do email é inválido.';
+        } else if (err.code === 'auth/weak-password') {
+          msg = 'A palavra-passe é demasiado fraca.';
+        }
+        showAuthAlert(msg, 'error');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Criar Conta Firebase';
+        }
+      }
+    }
+
+    async function handleFirebaseGoogleLogin() {
+      clearAuthAlert();
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        await firebaseAuth.signInWithPopup(provider);
+      } catch (err) {
+        console.error('Firebase Google Login Error:', err);
+        if (err.code !== 'auth/popup-closed-by-user') {
+          showAuthAlert('Não foi possível iniciar com o Google via Firebase.', 'error');
+        }
+      }
+    }
+
+    async function handleFirebaseAnonymousLogin() {
+      clearAuthAlert();
+      try {
+        await firebaseAuth.signInAnonymously();
+      } catch (err) {
+        console.error('Firebase Anon Login Error:', err);
+        showAuthAlert('Erro ao iniciar sessão anónima no Firebase.', 'error');
+      }
+    }
+
+    async function updateFanCardWithUserData(user) {
+      if (!user) return;
+      const nameEl = document.getElementById('card-user-name');
+      const emailEl = document.getElementById('card-user-email');
+      const idEl = document.getElementById('card-user-id');
+      const badgeEl = document.getElementById('card-badge-status');
+      const providerEl = document.getElementById('card-provider-tag');
+
+      let displayName = user.displayName || (user.isAnonymous ? 'ADEpto CONVIDADO' : 'ADEpto DO DRAGÃO');
+      let emailText = user.email || (user.isAnonymous ? 'Sessão Anónima Firebase' : 'Sócio Registado');
+      let cardNumber = `FCP-1893-${user.uid.substring(0, 5).toUpperCase()}`;
+
+      // Check or save to Firestore
+      if (firestoreDb && !user.isAnonymous) {
+        try {
+          const docRef = firestoreDb.collection('users').doc(user.uid);
+          const snap = await docRef.get();
+          if (snap.exists) {
+            const data = snap.data();
+            if (data.displayName) displayName = data.displayName;
+            if (data.fanCardNumber) cardNumber = data.fanCardNumber;
+          } else {
+            await docRef.set({
+              id: user.uid,
+              email: user.email,
+              displayName: displayName,
+              fanCardNumber: cardNumber,
+              createdAt: new Date().toISOString()
+            }, { merge: true });
+          }
+        } catch (e) {
+          console.warn('Firestore read error:', e);
+        }
+      }
+
+      if (nameEl) nameEl.textContent = displayName.toUpperCase();
+      if (emailEl) emailEl.textContent = emailText;
+      if (idEl) idEl.textContent = `ID ADEPTO: #${cardNumber}`;
+      if (badgeEl) badgeEl.textContent = user.isAnonymous ? 'CONVIDADO' : 'SÓCIO VIP';
+      if (providerEl) {
+        const isGoogle = user.providerData && user.providerData.some(p => p.providerId === 'google.com');
+        providerEl.textContent = isGoogle 
+          ? '🔥 Firebase Auth • Google Provider'
+          : (user.isAnonymous ? '🔥 Firebase Auth • Anónimo' : '🔥 Firebase Auth • Email/Password');
+      }
+    }
+
+    function showLoggedInUI(user) {
+      const unlogged = document.getElementById('auth-view-unlogged');
+      const logged = document.getElementById('auth-view-logged');
+      const headerLabel = document.getElementById('header-auth-label');
+
+      if (unlogged) unlogged.style.display = 'none';
+      if (logged) logged.style.display = 'flex';
+      if (headerLabel) {
+        headerLabel.textContent = user.displayName ? user.displayName.split(' ')[0] : 'Cartão Sócio';
+      }
+    }
+
+    function showLoggedOutUI() {
+      const unlogged = document.getElementById('auth-view-unlogged');
+      const logged = document.getElementById('auth-view-logged');
+      const headerLabel = document.getElementById('header-auth-label');
+
+      if (unlogged) unlogged.style.display = 'flex';
+      if (logged) logged.style.display = 'none';
+      if (headerLabel) headerLabel.textContent = 'Entrar';
+    }
+
+    async function handleFirebaseSignOut() {
+      if (firebaseAuth) {
+        try {
+          await firebaseAuth.signOut();
+        } catch (err) {
+          console.error('Sign out error:', err);
+        }
+      }
+      showLoggedOutUI();
+      closeAuthModal();
+    }
+
     function openAuthModal() {
+      clearAuthAlert();
       document.getElementById('auth-modal').classList.add('open');
     }
+
     function closeAuthModal() {
       document.getElementById('auth-modal').classList.remove('open');
-    }
-
-    function handleGoogleLogin() {
-      isUserLoggedIn = true;
-      document.getElementById('auth-view-unlogged').style.display = 'none';
-      document.getElementById('auth-view-logged').style.display = 'flex';
-      document.getElementById('header-auth-label').textContent = 'Cartão de Sócio';
-    }
-
-    function handleGoogleSignOut() {
-      isUserLoggedIn = false;
-      document.getElementById('auth-view-unlogged').style.display = 'flex';
-      document.getElementById('auth-view-logged').style.display = 'none';
-      document.getElementById('header-auth-label').textContent = 'Entrar';
-      closeAuthModal();
     }
 
     function openAIModal() {
       document.getElementById('ai-modal').classList.add('open');
       document.getElementById('ai-input-field').focus();
     }
+
     function closeAIModal() {
       document.getElementById('ai-modal').classList.remove('open');
     }

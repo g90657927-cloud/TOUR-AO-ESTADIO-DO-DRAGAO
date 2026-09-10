@@ -214,20 +214,77 @@ function getLocalDragaoAnswer(prompt: string): { text: string; mapSources: Array
   };
 }
 
-// 2. API: Gemini with Google Maps Grounding & Smart Fallback
+// 2. API: Ollama & Gemini with Google Maps Grounding & Smart Fallback
+const DEFAULT_OLLAMA_KEY = process.env.OLLAMA_API_KEY || "3c06912b453e42238f182386c961fde5.-wuzl1x1sE_C75WRDbksR3ls";
+
+async function queryOllama(prompt: string, customKey?: string): Promise<string | null> {
+  const activeKey = customKey?.trim() || DEFAULT_OLLAMA_KEY;
+  if (!activeKey) return null;
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+    const response = await fetch("https://api.ollama.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${activeKey}`,
+      },
+      body: JSON.stringify({
+        model: "llama3",
+        messages: [
+          {
+            role: "system",
+            content: "Tu és o Guia Oficial do Estádio do Dragão do FC Porto, desenvolvido por Gustavo. Responde em português europeu com clareza, simpatia e precisão sobre o estádio, acessos, museu, zonas, transportes e história."
+          },
+          { role: "user", content: prompt }
+        ],
+        stream: false
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+
+    if (response.ok) {
+      const data = await response.json();
+      const content = data?.choices?.[0]?.message?.content || data?.response;
+      if (content) return content;
+    }
+  } catch (e) {
+    // Silently fall back to Gemini or verified local knowledge
+  }
+  return null;
+}
+
 app.post("/api/gemini/dragao-info", async (req, res) => {
-  const { prompt } = req.body;
+  const { prompt, apiKey, ollamaKey } = req.body;
   if (!prompt || typeof prompt !== "string") {
     return res.status(400).json({ error: "Prompt string is required." });
   }
 
+  // 1. Try Ollama with custom or default key if available
+  const userKey = ollamaKey || apiKey;
+  const ollamaResult = await queryOllama(prompt, userKey);
+  if (ollamaResult) {
+    const defaultMaps = [
+      { title: "Estádio do Dragão (Google Maps)", uri: "https://www.google.com/maps/place/Est%C3%A1dio+do+Drag%C3%A3o/@41.161758,-8.583933,17z" },
+      { title: "Museu FC Porto by BMG", uri: "https://www.google.com/maps/search/?api=1&query=Museu+FC+Porto+Estadio+do+Dragao" }
+    ];
+    return res.json({
+      text: ollamaResult,
+      groundingChunks: [],
+      mapSources: defaultMaps,
+      provider: "ollama"
+    });
+  }
+
+  // 2. Try Gemini with Google Maps Grounding
   try {
     const ai = getAIClient();
 
-    // Primary call with Gemini and Google Maps Grounding
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: `Tu és o Guia Especialista Oficial do Estádio do Dragão e do FC Porto em Portugal.
+      contents: `Tu és o Guia Especialista Oficial do Estádio do Dragão e do FC Porto em Portugal, desenvolvido por Gustavo.
 Responde à seguinte pergunta do adepto sobre o Estádio do Dragão, acessos, museu, zonas reais, transportes (metro, autocarro), bilheteiras, parque de estacionamento ou locais vizinhos:
 "${prompt}"
 
@@ -268,9 +325,10 @@ Instruções:
       text,
       groundingChunks,
       mapSources,
+      provider: "gemini"
     });
   } catch (error: any) {
-    console.warn("Gemini API error or rate-limit (429), switching seamlessly to Dragão Knowledge Base:", error?.message || error);
+    console.warn("Gemini API fallback to Dragão Knowledge Base:", error?.message || error);
 
     // If Gemini fails (e.g. 429 Quota Exceeded, 503, or invalid key), return accurate domain knowledge
     const fallbackAnswer = getLocalDragaoAnswer(prompt);
@@ -278,6 +336,7 @@ Instruções:
       text: fallbackAnswer.text,
       groundingChunks: [],
       mapSources: fallbackAnswer.mapSources,
+      provider: "knowledge_base"
     });
   }
 });

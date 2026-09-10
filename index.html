@@ -1588,37 +1588,114 @@
     }
 
     /* Responsive Queries */
+    @media (max-width: 1024px) {
+      .stage-bottom-hud {
+        padding: 10px 14px;
+        gap: 12px;
+      }
+      .hud-info-left {
+        max-width: 55%;
+      }
+    }
+
     @media (max-width: 900px) {
+      .top-header {
+        padding: 8px 12px;
+        gap: 8px;
+      }
+      .header-actions {
+        gap: 6px;
+        overflow-x: auto;
+        max-width: 60%;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+      .header-actions::-webkit-scrollbar {
+        display: none;
+      }
       .zones-sidebar {
         position: absolute;
         top: 0;
         bottom: 0;
         left: 0;
+        width: 85%;
+        max-width: 320px;
+        z-index: 60;
         transform: translateX(-100%);
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8);
+        box-shadow: 10px 0 35px rgba(0, 0, 0, 0.9);
       }
       .zones-sidebar.open {
         transform: translateX(0);
       }
+      .mobile-sidebar-close {
+        display: block !important;
+      }
       .floating-toggle-sidebar {
         display: flex;
+        top: 10px;
+        left: 10px;
+      }
+      .sidebar-backdrop-mobile {
+        display: none;
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 55;
+      }
+      .sidebar-backdrop-mobile.active {
+        display: block;
       }
       .hud-info-left {
         max-width: 100%;
       }
       .stage-bottom-hud {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        padding: 10px 14px;
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .hud-zone-title {
+        font-size: 13px;
+      }
+      .hud-zone-desc {
+        font-size: 11px;
+        line-height: 1.35;
+        max-height: 48px;
+        overflow-y: auto;
       }
       .hud-actions-right {
         width: 100%;
-        justify-content: flex-end;
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 3px;
+        scrollbar-width: none;
       }
-      .stadium-chants-tray {
+      .hud-actions-right::-webkit-scrollbar {
         display: none;
       }
+      .stadium-chants-tray {
+        top: 10px;
+        right: 10px;
+        max-width: calc(100% - 130px);
+        overflow-x: auto;
+        padding: 4px 8px;
+        gap: 4px;
+        scrollbar-width: none;
+      }
+      .stadium-chants-tray::-webkit-scrollbar {
+        display: none;
+      }
+      .chant-btn {
+        padding: 4px 8px;
+        font-size: 10px;
+      }
       .flashscore-dialog {
-        height: 95vh;
+        height: 96dvh;
+        width: 98vw;
       }
       .flashscore-controls {
         margin-right: 0;
@@ -1626,14 +1703,99 @@
     }
 
     @media (max-width: 600px) {
+      .disclaimer-banner {
+        font-size: 10px;
+        padding: 4px 8px;
+        flex-wrap: wrap;
+        gap: 4px;
+        line-height: 1.3;
+      }
+      .disclaimer-tag-notice {
+        display: none;
+      }
       .brand-subtitle {
         display: none;
       }
-      .btn-action span {
-        display: none;
+      .brand-title {
+        font-size: 13px;
+      }
+      .brand-logo-svg {
+        width: 32px;
+        height: 32px;
       }
       .btn-action {
-        padding: 6px 9px;
+        padding: 6px 10px;
+        font-size: 11px;
+        height: 32px;
+      }
+      .btn-action span.action-btn-text {
+        display: none;
+      }
+      .btn-hud {
+        padding: 7px 11px;
+        font-size: 11px;
+        height: 32px;
+      }
+      .modal-dialog {
+        width: 95vw;
+        max-height: 90dvh;
+        border-radius: 14px;
+      }
+      .matchday-dialog {
+        max-width: 96vw;
+        border-radius: 14px;
+      }
+      .matchday-header {
+        padding: 14px 16px 10px;
+        gap: 10px;
+      }
+      .matchday-body {
+        padding: 14px 16px;
+      }
+      .matchday-title {
+        font-size: 15px;
+      }
+      .matchday-subtitle {
+        font-size: 11px;
+      }
+      .sectors-grid {
+        grid-template-columns: 1fr;
+      }
+      .transport-grid {
+        grid-template-columns: 1fr;
+      }
+      .countdown-val {
+        font-size: 18px;
+      }
+      .countdown-unit {
+        min-width: 50px;
+        padding: 6px 8px;
+      }
+      .flashscore-header {
+        padding: 10px 14px;
+      }
+      .flashscore-title-text {
+        font-size: 14px;
+      }
+      .flashscore-notice-bar {
+        padding: 6px 12px;
+        font-size: 11px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .top-header {
+        padding: 6px 8px;
+      }
+      .brand-badge {
+        display: none;
+      }
+      .floating-toggle-sidebar span {
+        display: none;
+      }
+      .floating-toggle-sidebar {
+        padding: 7px;
+        border-radius: 8px;
       }
     }
   </style>
@@ -1670,17 +1832,19 @@
         <!-- 🔴 Flashscore: Vai ver se o Porto está a jogar! -->
         <button class="btn-action flashscore-btn" id="btn-open-flashscore-modal" onclick="openFlashscoreModal()" title="Vai ver se o FC Porto está a jogar agora no Flashscore!">
           <span class="live-pulse-dot"></span>
-          <span>Vai ver se o Porto está a jogar!</span>
+          <span class="action-btn-text">Flashscore Ao Vivo</span>
         </button>
 
         <!-- 🏟️ Guia de Dia de Jogo, Portas & Transportes -->
         <button class="btn-action matchday-btn" id="btn-open-matchday-modal" onclick="openMatchdayModal()" title="Abrir Guia de Dia de Jogo, Portas, Transportes e Quiz">
-          <span>⚽ Dia de Jogo & Acessos</span>
+          <span>⚽</span>
+          <span class="action-btn-text">Dia de Jogo</span>
         </button>
 
         <!-- 🏛️ Quick Jump to Museu FC Porto -->
         <button class="btn-action museum-quick-btn" onclick="selectZone('museu-fcporto')" title="Ir Diretamente ao Museu FC Porto by BMG">
-          🏛️ <span>Museu do Porto</span>
+          <span>🏛️</span>
+          <span class="action-btn-text">Museu</span>
         </button>
 
         <!-- 🎙️ Narrador do Estádio (Web Speech API) -->
@@ -1691,7 +1855,7 @@
             <line x1="12" y1="19" x2="12" y2="23"></line>
             <line x1="8" y1="23" x2="16" y2="23"></line>
           </svg>
-          <span id="narrator-btn-label">Narrador: OFF</span>
+          <span id="narrator-btn-label" class="action-btn-text">Narrador: OFF</span>
         </button>
 
         <!-- 🔊 Stadium Sound System Toggle -->
@@ -1702,7 +1866,7 @@
             <div class="sound-bar"></div>
             <div class="sound-bar"></div>
           </div>
-          <span id="audio-btn-label">Som do Dragão</span>
+          <span id="audio-btn-label" class="action-btn-text">Som</span>
         </button>
 
         <!-- ✨ Gemini & Ollama AI Guide Button -->
@@ -1710,7 +1874,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
           </svg>
-          <span>Guia IA</span>
+          <span class="action-btn-text">Guia IA</span>
         </button>
 
         <!-- 👤 Google Login / Member Fan Card -->
@@ -1719,13 +1883,16 @@
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
-          <span id="header-auth-label">Entrar</span>
+          <span id="header-auth-label" class="action-btn-text">Entrar</span>
         </button>
       </div>
     </header>
 
     <!-- Main Workspace -->
     <main class="main-workspace">
+      <!-- Mobile Sidebar Backdrop Overlay -->
+      <div class="sidebar-backdrop-mobile" id="sidebar-backdrop-mobile"></div>
+
       <!-- Mobile Sidebar Toggle -->
       <button class="floating-toggle-sidebar" id="btn-toggle-sidebar">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1746,7 +1913,10 @@
             </svg>
             <span>Zonas Reais do Dragão</span>
           </div>
-          <span class="zones-count-badge" id="zones-count">8 Locais</span>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="zones-count-badge" id="zones-count">8 Locais</span>
+            <button id="btn-close-sidebar-mobile" style="background:transparent; border:none; color:#FFF; font-size:18px; cursor:pointer; padding:2px 6px; display:none;" class="mobile-sidebar-close">&times;</button>
+          </div>
         </div>
 
         <div class="sidebar-search-wrap">
@@ -2503,14 +2673,35 @@
         `;
         card.addEventListener('click', () => {
           selectZone(zone.id);
-          if (window.innerWidth <= 900) {
-            document.getElementById('zones-sidebar').classList.remove('open');
-          }
+          closeMobileSidebar();
         });
         listEl.appendChild(card);
       });
 
       document.getElementById('zones-count').textContent = `${zonesToRender.length} Locais`;
+    }
+
+    function closeMobileSidebar() {
+      const sidebar = document.getElementById('zones-sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop-mobile');
+      if (sidebar) sidebar.classList.remove('open');
+      if (backdrop) backdrop.classList.remove('active');
+    }
+
+    function openMobileSidebar() {
+      const sidebar = document.getElementById('zones-sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop-mobile');
+      if (sidebar) sidebar.classList.add('open');
+      if (backdrop) backdrop.classList.add('active');
+    }
+
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('zones-sidebar');
+      if (sidebar && sidebar.classList.contains('open')) {
+        closeMobileSidebar();
+      } else {
+        openMobileSidebar();
+      }
     }
 
     function filterZonesList(query) {
@@ -2562,11 +2753,17 @@
     function setupEventListeners() {
       // Toggle sidebar on mobile
       const sidebarToggle = document.getElementById('btn-toggle-sidebar');
-      const sidebar = document.getElementById('zones-sidebar');
-      if (sidebarToggle && sidebar) {
-        sidebarToggle.addEventListener('click', () => {
-          sidebar.classList.toggle('open');
-        });
+      const sidebarClose = document.getElementById('btn-close-sidebar-mobile');
+      const backdrop = document.getElementById('sidebar-backdrop-mobile');
+
+      if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', toggleMobileSidebar);
+      }
+      if (sidebarClose) {
+        sidebarClose.addEventListener('click', closeMobileSidebar);
+      }
+      if (backdrop) {
+        backdrop.addEventListener('click', closeMobileSidebar);
       }
 
       // Fullscreen toggle
